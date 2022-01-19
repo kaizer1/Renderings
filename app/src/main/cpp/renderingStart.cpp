@@ -743,6 +743,8 @@ void android_main(struct android_app* state){
       // surface created
 
 
+      // image created 
+
     FpvkDestroyDebugReportCallbackEXT(vulkanA.mainInstance, cb1, nullptr);
     logRun("post loading vkCreateDebugReportCallbackEXT \n");
 

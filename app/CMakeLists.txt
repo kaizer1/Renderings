@@ -22,14 +22,17 @@ endif()
 
 add_library(glueLos STATIC ${gluLos}/los_android_native_app_glue.c)
 
-
-set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVK_USE_PLATFORM_ANDROID_KHR")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
 
 
 add_library( renderingsLos  SHARED
 
-        src/main/cpp/renderingStart.cpp)
+        src/main/cpp/renderingStart.cpp
+        src/main/cpp/mainLos/LosMainVulkan.cpp
+        src/main/cpp/mainLos/assetsLos.c
+        src/main/cpp/gameRender.cpp
+        )
 
 
 find_library(  log-lib
@@ -39,6 +42,7 @@ find_library(  log-lib
 target_include_directories(renderingsLos PRIVATE
         ${gluLos}
         ../../VulkanHeaders/include
+        src/main/cpp/mainLos/
 
         )
 
@@ -56,3 +60,10 @@ target_link_libraries(renderingsLos
                        glueLos
 
                       ${log-lib} )
+
+# add sanitize for android
+#[[
+if(ANDROID_ABI STREQUAL "arm64-v8a" AND HWASAN)
+  target_compile_options(native-lib PUBLIC -fsanitize=hwaddress -fno-omit-frame-pointer)
+  set_target_properties(native-lib PROPERTIES LINK_FLAGS -fsanitize=hwaddress)
+endif()]]

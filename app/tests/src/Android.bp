@@ -1,0 +1,22 @@
+// Loskutnikov Games testing 
+
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+cc_test {
+    name: "MyFirstTest",
+    srcs: ["TestLos/MyFirstTest.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        
+    ],
+    test_suites: ["general-tests"],
+    host_supported: true,
+    // Do not mark as unit tests, to use as a validation in test mapping
+    // and test harness in some situations.
+    test_options: {
+        unit_test: false,
+    },
+}

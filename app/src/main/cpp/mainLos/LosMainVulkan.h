@@ -72,6 +72,9 @@ public:
     }
 
     VkInstance  mainInstance;
+    uint32_t mLosQueueFIndex; // graphics index
+    VkDevice mDeviceLos;
+    VkQueue mQueueLos;
 };
 
 
@@ -100,6 +103,9 @@ public:
     //PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = LOAD_HARD(vkCreateDebugReportCallbackEXT);
     PFN_vkDebugReportCallbackEXT vkDebugReportCallbackEXT = LOAD_HARD(vkDebugReportCallbackEXT);
     //PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHRNew = LOAD_HARD(vkCreateAndroidSurfaceKHRNew);
+    PFN_vkDestroyDevice vkDestroyDevice = LOAD_HARD(vkDestroyDevice);
+    PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR = LOAD_HARD(vkDestroySurfaceKHR);
+    PFN_vkCreateDevice vkCreateDevice = LOAD_HARD(vkCreateDevice);
 
     void initializedAll(){
 
@@ -109,6 +115,9 @@ public:
         Load(vkEnumerateInstanceLayerProperties, "vkEnumerateInstanceLayerProperties");
         Load(vkCreateInstance, "vkCreateInstance");
         Load(vkDestroyInstance, "vkDestroyInstance");
+        Load(vkDestroyDevice, "vkDestroyDevice");
+        Load(vkDestroySurfaceKHR, "vkDestroySurfaceKHR");
+        Load(vkCreateDevice, "vkCreateDevice");
 
         // vkGetInstanceProcAddr
         Load(vkGetInstanceProcAddr, "vkGetInstanceProcAddr");

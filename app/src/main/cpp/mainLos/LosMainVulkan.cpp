@@ -2,6 +2,7 @@
 // Created by loskutnikov on 24.01.2022.
 //
 
+#include <assert.h>
 #include "LosMainVulkan.h"
 
 
@@ -534,6 +535,11 @@ void LosMainVulkan::initializeMyVulkan(){
 //     logRun(" my width screen == %d \n ", ANativeWindow_getWidth(state->pendingWindow));
 
 
+
+  // getCPU count
+
+
+
     CheckVulkan *check = new CheckVulkan();
     check->initializedAll();
 
@@ -709,14 +715,18 @@ void LosMainVulkan::initializeMyVulkan(){
     logRun(" extens2 my ==%d,  %s,  ", countExtens, *myExtension2);
 
     // VK_EXT_debug_report
-    const char*  extenslos[3];// = "VK_EXT_debug_report;VK_KHR_android_surface;VK_KHR_surface";
+    const char*  extenslos[6];// = "VK_EXT_debug_report;VK_KHR_android_surface;VK_KHR_surface";
     extenslos[0] = "VK_EXT_debug_report";
     extenslos[1] = "VK_KHR_android_surface";
     extenslos[2] = "VK_KHR_surface";
+    extenslos[3] = "VK_KHR_get_physical_device_properties2";
+    extenslos[4] = "VK_KHR_get_surface_capabilities2";
+    extenslos[5] = "VK_KHR_external_memory_capabilities";
+
 
     logRun(" my extens == %s \n", extenslos[1]);
 
-    instanceInfo.enabledExtensionCount = 3 ;// countExtens;//  instancExtensCount;
+    instanceInfo.enabledExtensionCount = 6;// countExtens;//  instancExtensCount;
     instanceInfo.ppEnabledExtensionNames = extenslos; //myExtension2;  //extensionForAdd.data();
     logRun(" sdf  wei8 8 \n");
     res = check->vkCreateInstance(&instanceInfo, nullptr, &vulkanA.mainInstance);
@@ -869,6 +879,133 @@ void LosMainVulkan::initializeMyVulkan(){
     // has queue families which can perform the actions we require. For this, we request
     // the number of queue families, and their properties.
 
+
+    PFN_vkVoidFunction tempDeviceQueuFamilyProe = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetPhysicalDeviceQueueFamilyProperties" );
+    if( !tempDeviceQueuFamilyProe ) throw  "Failed to load vkGetPhysicalDeviceQueueFamilyProperties";
+
+    PFN_vkGetPhysicalDeviceQueueFamilyProperties vkGetPhysicalDeviceQueueFamilyProperties1 = reinterpret_cast<PFN_vkGetPhysicalDeviceQueueFamilyProperties>( tempDeviceQueuFamilyProe );
+
+
+    PFN_vkVoidFunction deviSurSuppoe = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetPhysicalDeviceSurfaceSupportKHR" );
+    if( !deviSurSuppoe ) throw  "Failed to load vkGetPhysicalDeviceSurfaceSupportKHR";
+
+    PFN_vkGetPhysicalDeviceSurfaceSupportKHR vkGetPhysicalDeviceSurfaceSupportKHR1 = reinterpret_cast<PFN_vkGetPhysicalDeviceSurfaceSupportKHR>( deviSurSuppoe );
+
+
+
+      uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties1(myPhysicalDevice, &queueFamilyCount, nullptr);
+    logRun(" my queue properties count == %d \n", queueFamilyCount);
+    VkQueueFamilyProperties* queuePropeties = new VkQueueFamilyProperties[queueFamilyCount];
+    vkGetPhysicalDeviceQueueFamilyProperties1(myPhysicalDevice, &queueFamilyCount, queuePropeties);
+     assert(queueFamilyCount >= 1);
+
+       VkBool32* supportPresent = new VkBool32[queueFamilyCount];
+       for (uint32_t i = 0; i < queueFamilyCount; i++){
+           vkGetPhysicalDeviceSurfaceSupportKHR1(myPhysicalDevice, i, mSurfaceLos, &supportPresent[i]);
+       }
+
+       // check graphics bit
+      uint32_t  queueIndex = UINT32_MAX;
+       for (uint32_t i = 0; i < queueFamilyCount; i++){
+           if((queuePropeties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0){
+                if(supportPresent[i] == VK_TRUE){
+                    queueIndex = i;
+                     logRun(" my index this ! ok ");
+                    break;
+                }
+           }
+       }
+
+        delete[] supportPresent;
+        delete[] queuePropeties;
+
+         if (queueIndex == UINT32_MAX){
+              logRun(" Could not obtain a queue family for both graphics and p \n");
+         }
+
+
+         vulkanA.mLosQueueFIndex = queueIndex;
+
+         float queuePriorities[1] = {1.0 };
+         VkDeviceQueueCreateInfo  deviceQueueCreateInfo = {};
+         deviceQueueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+         deviceQueueCreateInfo.pNext = nullptr;
+         deviceQueueCreateInfo.queueFamilyIndex = vulkanA.mLosQueueFIndex;
+         deviceQueueCreateInfo.queueCount = 1;
+         deviceQueueCreateInfo.pQueuePriorities = queuePriorities;
+
+         VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext = nullptr;
+    deviceCreateInfo.queueCreateInfoCount = 1;
+    deviceCreateInfo.pQueueCreateInfos = &deviceQueueCreateInfo;
+    deviceCreateInfo.enabledLayerCount = 0;
+    deviceCreateInfo.ppEnabledLayerNames = nullptr;
+
+    //  VK_EXT_external_memory_dma_buf
+    //   VK_EXT_image_drm_format_modifier
+    //   VK_ANDROID_external_memory_android_hardware_buffer
+    //   VK_KHR_swapchain
+    // VK_KHR_variable_pointers
+    //   VK_KHR_incremental_present
+    //   VK_KHR_shared_presentable_image
+    //   VK_GOOGLE_display_timing
+    //   VK_KHR_16bit_storage
+
+     const char* newExtenHonor[19];
+    newExtenHonor[0] = "VK_EXT_external_memory_dma_buf";
+    newExtenHonor[1] = "VK_EXT_image_drm_format_modifier";
+    newExtenHonor[2] = "VK_ANDROID_external_memory_android_hardware_buffer";
+    newExtenHonor[3] = "VK_KHR_swapchain";
+    newExtenHonor[4] = "VK_KHR_variable_pointers";
+    newExtenHonor[5] = "VK_KHR_incremental_present";
+    newExtenHonor[6] = "VK_KHR_shared_presentable_image";
+    newExtenHonor[7] = "VK_GOOGLE_display_timing";
+    newExtenHonor[8] = "VK_KHR_16bit_storage";
+    newExtenHonor[9] = "VK_KHR_external_memory_fd";
+    newExtenHonor[10] = "VK_KHR_bind_memory2";
+    newExtenHonor[11] = "VK_KHR_image_format_list";
+    newExtenHonor[12] = "VK_KHR_sampler_ycbcr_conversion";
+
+    newExtenHonor[13] = "VK_KHR_external_memory";
+    newExtenHonor[14] = "VK_EXT_queue_family_foreign";
+    newExtenHonor[15] = "VK_KHR_storage_buffer_storage_class";
+    newExtenHonor[16] = "VK_KHR_external_memory";
+    newExtenHonor[17] = "VK_KHR_maintenance1";
+    newExtenHonor[18] = "VK_KHR_get_memory_requirements2";
+
+    // VK_KHR_external_memory,
+    // VK_EXT_queue_family_foreign
+    // VK_KHR_storage_buffer_storage_class
+    // VK_KHR_get_surface_capabilities2
+    // VK_KHR_external_memory
+    // VK_KHR_maintenance1,
+    // VK_KHR_get_memory_requirements2
+
+    deviceCreateInfo.enabledExtensionCount =  19;
+    deviceCreateInfo.ppEnabledExtensionNames = newExtenHonor;
+
+
+   // PFN_vkVoidFunction kCeDevies = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkCreateDevice" );
+   // if( !kCeDevies ) throw  "Failed to load vkCreateDevice";
+
+   // PFN_vkCreateDevice vkCreateDevice1 = reinterpret_cast<PFN_vkCreateDevice>( kCeDevies );
+
+    // create Device
+    res = check->vkCreateDevice(myPhysicalDevice, &deviceCreateInfo, nullptr, &vulkanA.mDeviceLos);
+     cb(res);
+
+
+
+    PFN_vkVoidFunction getDeviQueu = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetDeviceQueue" );
+    if( !getDeviQueu ) throw  "Failed to load vkGetDeviceQueue";
+
+    PFN_vkGetDeviceQueue vkGetDeviceQueue1 = reinterpret_cast<PFN_vkGetDeviceQueue>( getDeviQueu );
+    vkGetDeviceQueue1(vulkanA.mDeviceLos, vulkanA.mLosQueueFIndex, 0, &vulkanA.mQueueLos);
+         // check compute bit
+
+
     // vkGetPhysicalDeviceQueueFamilyProperties
 
 
@@ -891,6 +1028,18 @@ void LosMainVulkan::initializeMyVulkan(){
 
 
     // image created
+
+
+     // destroy vkDevice, mSurfaceLos
+     // mSurfaceLos
+
+
+
+
+
+    check->vkDestroyDevice(vulkanA.mDeviceLos, nullptr);
+    check->vkDestroySurfaceKHR(vulkanA.mainInstance, mSurfaceLos, nullptr);
+   // vkDestroyInstance(vulkanA.mainInstance, nullptr);
 
     FpvkDestroyDebugReportCallbackEXT(vulkanA.mainInstance, cb1, nullptr);
     logRun("post loading vkCreateDebugReportCallbackEXT \n");

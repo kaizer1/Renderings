@@ -943,16 +943,6 @@ void LosMainVulkan::initializeMyVulkan(){
     deviceCreateInfo.enabledLayerCount = 0;
     deviceCreateInfo.ppEnabledLayerNames = nullptr;
 
-    //  VK_EXT_external_memory_dma_buf
-    //   VK_EXT_image_drm_format_modifier
-    //   VK_ANDROID_external_memory_android_hardware_buffer
-    //   VK_KHR_swapchain
-    // VK_KHR_variable_pointers
-    //   VK_KHR_incremental_present
-    //   VK_KHR_shared_presentable_image
-    //   VK_GOOGLE_display_timing
-    //   VK_KHR_16bit_storage
-
      const char* newExtenHonor[19];
     newExtenHonor[0] = "VK_EXT_external_memory_dma_buf";
     newExtenHonor[1] = "VK_EXT_image_drm_format_modifier";
@@ -967,22 +957,12 @@ void LosMainVulkan::initializeMyVulkan(){
     newExtenHonor[10] = "VK_KHR_bind_memory2";
     newExtenHonor[11] = "VK_KHR_image_format_list";
     newExtenHonor[12] = "VK_KHR_sampler_ycbcr_conversion";
-
     newExtenHonor[13] = "VK_KHR_external_memory";
     newExtenHonor[14] = "VK_EXT_queue_family_foreign";
     newExtenHonor[15] = "VK_KHR_storage_buffer_storage_class";
     newExtenHonor[16] = "VK_KHR_external_memory";
     newExtenHonor[17] = "VK_KHR_maintenance1";
     newExtenHonor[18] = "VK_KHR_get_memory_requirements2";
-
-    // VK_KHR_external_memory,
-    // VK_EXT_queue_family_foreign
-    // VK_KHR_storage_buffer_storage_class
-    // VK_KHR_get_surface_capabilities2
-    // VK_KHR_external_memory
-    // VK_KHR_maintenance1,
-    // VK_KHR_get_memory_requirements2
-
     deviceCreateInfo.enabledExtensionCount =  19;
     deviceCreateInfo.ppEnabledExtensionNames = newExtenHonor;
 
@@ -1003,10 +983,12 @@ void LosMainVulkan::initializeMyVulkan(){
 
     PFN_vkGetDeviceQueue vkGetDeviceQueue1 = reinterpret_cast<PFN_vkGetDeviceQueue>( getDeviQueu );
     vkGetDeviceQueue1(vulkanA.mDeviceLos, vulkanA.mLosQueueFIndex, 0, &vulkanA.mQueueLos);
+
          // check compute bit
 
 
-    // vkGetPhysicalDeviceQueueFamilyProperties
+
+
 
 
 
@@ -1018,6 +1000,62 @@ void LosMainVulkan::initializeMyVulkan(){
 
 
     // initSwapChain
+
+
+    PFN_vkVoidFunction getdkFroJHRh = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetPhysicalDeviceSurfaceFormatsKHR" );
+    if( !getdkFroJHRh ) throw  "Failed to load vkGetPhysicalDeviceSurfaceFormatsKHR";
+
+    PFN_vkGetPhysicalDeviceSurfaceFormatsKHR vkGetPhysicalDeviceSurfaceFormatsKHR1 = reinterpret_cast<PFN_vkGetPhysicalDeviceSurfaceFormatsKHR>( getdkFroJHRh );
+      uint32_t formatCount;
+      res = vkGetPhysicalDeviceSurfaceFormatsKHR1(myPhysicalDevice, mSurfaceLos, &formatCount,nullptr);
+      logRun(" my count == %d \n", formatCount);
+      VkSurfaceFormatKHR* surfFormat = new VkSurfaceFormatKHR[formatCount];
+      res =  vkGetPhysicalDeviceSurfaceFormatsKHR1(myPhysicalDevice, mSurfaceLos, &formatCount,surfFormat);
+       cb(res);
+
+        if (formatCount == 1 && surfFormat[0].format == VK_FORMAT_UNDEFINED){
+            vulkanA.mSurfaceLosFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+            vulkanA.mSurfaceLosFormat.colorSpace = surfFormat[0].colorSpace;
+        } else {
+             vulkanA.mSurfaceLosFormat = surfFormat[0];
+        }
+        delete[] surfFormat;
+
+         VkSurfaceCapabilitiesKHR  surfaceCapabilitiesKhrLos;
+
+    PFN_vkVoidFunction getSupCapabKHR = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+    if( !getSupCapabKHR ) throw  "Failed to load vkGetPhysicalDeviceSurfaceCapabilitiesKHR";
+
+    PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR vkGetPhysicalDeviceSurfaceCapabilitiesKHR1 = reinterpret_cast<PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR>( getSupCapabKHR );
+
+    res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR1(myPhysicalDevice, mSurfaceLos, &surfaceCapabilitiesKhrLos);
+    cb(res);
+
+     // ok return - 1080 vs 2285
+      logRun(" my surface wisth and height == %d, %d \n", surfaceCapabilitiesKhrLos.currentExtent.width, surfaceCapabilitiesKhrLos.currentExtent.height);
+
+
+
+      // Create FIFO mode ( need anothed try )
+     VkSwapchainCreateInfoKHR swapCInfo = {};
+     swapCInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+     swapCInfo.surface = mSurfaceLos;
+     swapCInfo.minImageCount = surfaceCapabilitiesKhrLos.minImageCount;
+     swapCInfo.imageFormat = vulkanA.mSurfaceLosFormat.format;
+     swapCInfo.imageColorSpace = vulkanA.mSurfaceLosFormat.colorSpace;
+     swapCInfo.imageExtent.width = surfaceCapabilitiesKhrLos.currentExtent.width;
+     swapCInfo.imageExtent.height = surfaceCapabilitiesKhrLos.currentExtent.height;
+     swapCInfo.imageUsage = surfaceCapabilitiesKhrLos.supportedUsageFlags;
+     swapCInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+     swapCInfo.imageArrayLayers = 1;
+     swapCInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+     swapCInfo.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+     swapCInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // !!!!! TODO !!!!!
+     swapCInfo.clipped = VK_TRUE;
+
+
+
+
 
 
 

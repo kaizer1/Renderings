@@ -75,6 +75,7 @@ public:
     uint32_t mLosQueueFIndex; // graphics index
     VkDevice mDeviceLos;
     VkQueue mQueueLos;
+    VkSurfaceFormatKHR mSurfaceLosFormat;
 };
 
 

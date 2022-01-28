@@ -2,9 +2,9 @@
 // Created by loskutnikov on 24.01.2022.
 //
 
-#include <assert.h>
+#include <cassert>
 #include "LosMainVulkan.h"
-
+#include "logLos.h"
 
 inline void cb(VkResult myResult ) noexcept {
 
@@ -269,6 +269,29 @@ std::string_view to_string( VkDebugReportObjectTypeEXT o ){
 }
 
 
+VkPhysicalDeviceMemoryProperties myPhysicalDeviceMemoryPropertises2;
+
+bool getMemoryTypeFromProperties(uint32_t typeBits, VkFlags requirementsMask, uint32_t* typeIndex)
+{
+    // typeCheck != nullptr
+     if( typeIndex == nullptr){
+         logRun(" error : typeIndex == nullptr ! ");
+         return false;
+     }
+      for (uint32_t i = 0; i < 32; i++ ){
+           if ((typeBits & 1) == 1)
+           {
+                if ((myPhysicalDeviceMemoryPropertises2.memoryTypes[i].propertyFlags & requirementsMask) == requirementsMask)
+                {
+                    *typeIndex = i;
+                    return true;
+                }
+           }
+           typeBits >>= 1;
+      }
+     return false;
+}
+
 VKAPI_ATTR VkBool32 VKAPI_CALL genericDebugCallback(
         VkDebugReportFlagsEXT msgFlags,
         VkDebugReportObjectTypeEXT objType,
@@ -512,11 +535,126 @@ int32_t LosMainVulkan::losInputWorkingHandle (struct android_app* app, AInputEve
 }
 
 
+#include <cpu-features.h>
 
-void LosMainVulkan::initializeMyVulkan(){
+#include <chrono>
+#include <iostream>
+#include <thread>
+
+#include <execution>
+#include <algorithm>
+
+#include <experimental/coroutine>
+#include <experimental/functional>
+#include <omp.h>
+
+
+static const long long numThreads = 1'000;
+
+
+struct Job {
+    struct promise_type;
+    using handle_type = std::experimental::coroutine_handle<promise_type>;
+    handle_type coro;
+    Job(handle_type h): coro(h){}
+    ~Job() {
+        if ( coro ) coro.destroy();
+    }
+    void start() {
+        coro.resume();
+    }
+
+
+    struct promise_type {
+        auto get_return_object() {
+            return Job{handle_type::from_promise(*this)};
+        }
+        std::experimental::suspend_always initial_suspend() {
+            logRun ("    Preparing job \n" );
+            return {};
+        }
+        std::experimental::suspend_always final_suspend() noexcept {
+            logRun( "    Performing job \n" );
+            return {};
+        }
+        void return_void() {}
+        void unhandled_exception() {}
+
+    };
+};
+
+
+Job prepareJob() {
+    co_await std::experimental::suspend_never();
+}
+
+
+/*struct aBlock {
+    int a : 6;
+
+};*/
+
+//#include <aaudio/aa>
+
+void LosMainVulkan::initializeMyVulkan() {
+
+     // detect cpu core count
+    const int coreSize = android_getCpuCount();
+     logRun(" my core size == %d \n", coreSize);
+
+
+       auto start = std::chrono::system_clock::now();
+
+       for(int i = 0; i < numThreads; ++i) std::thread([]{}).detach();
+
+       std::chrono::duration<double> dur = std::chrono::system_clock::now() - start;
+        logRun ( "time: %f \n", dur.count() ); // 0.261780 - 1000 threads
+
+        /*logRun(" my version  C++ == %d \n", _LIBCPP_STD_VER);
+         if constexpr (_LIBCPP_HAS_PARALLEL_ALGORITHMS){
+
+         }else{
+
+         }*/
+
+        logRun(" Before job  \n");
+
+        auto jobLos = prepareJob();
+        jobLos.start();
+        logRun(" After job \n");
+
+
+        // work Fine !! // logRun("openMP ! %d \n", _OPENMP); // 201811 what version  OpenMP 5.0 spec should be 201811.
+
+
+   // static_assert(std::is_same<int &, typename add_lvalue_refences<int>::type>{});
+
+        //    maybe shared
+#pragma omp parallel default (none)
+    for (int k = 0; k < 10000; k++){
+             int i = k*2 + 1;
+         }
+
+
+
+
+
+  /*     std::vector<int> myVd {1, 3, 4, 5,6};
+
+       try {
+            std::for_each(std::execution::seq, myVd.begin(), myVd.end(),
+                          [](int) { throw std::runtime_error("With execute policy "); });
+       }catch(const std::runtime_error& r){
+            logRun(" my error == %s \n", r.what() );
+       }catch(...){
+           logRun(" anymore error ! \n");
+       }*/
+
 
 
     myVulkan vulkanA = myVulkan();
+    losGame = std::make_unique<gameRender>();
+
     bool debugUtilsExists = false;
     bool debugReport = false;
     bool surface_capa2 = false;
@@ -808,7 +946,7 @@ void LosMainVulkan::initializeMyVulkan(){
 
     PFN_vkGetPhysicalDeviceMemoryProperties vkGetPhysicalDeviceMemoryProperties1 = reinterpret_cast<PFN_vkGetPhysicalDeviceMemoryProperties>( temp_fp2DevDmProper );
 
-    VkPhysicalDeviceMemoryProperties myPhysicalDeviceMemoryPropertises2;
+
     vkGetPhysicalDeviceMemoryProperties1(myPhysicalDevice, &myPhysicalDeviceMemoryPropertises2);
 
 
@@ -1034,9 +1172,12 @@ void LosMainVulkan::initializeMyVulkan(){
      // ok return - 1080 vs 2285
       logRun(" my surface wisth and height == %d, %d \n", surfaceCapabilitiesKhrLos.currentExtent.width, surfaceCapabilitiesKhrLos.currentExtent.height);
 
+     LosWidth = surfaceCapabilitiesKhrLos.currentExtent.width;
+     LosHeight = surfaceCapabilitiesKhrLos.currentExtent.height;
 
 
       // Create FIFO mode ( need anothed try )
+
      VkSwapchainCreateInfoKHR swapCInfo = {};
      swapCInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
      swapCInfo.surface = mSurfaceLos;
@@ -1052,14 +1193,148 @@ void LosMainVulkan::initializeMyVulkan(){
      swapCInfo.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
      swapCInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // !!!!! TODO !!!!!
      swapCInfo.clipped = VK_TRUE;
+      logRun(" pre error 001 1 \n");
+
+    //PFN_vkVoidFunction vkGetSwapcJjhdj3 = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkCreateSwapchainKHR");
+    //if( !vkGetSwapcJjhdj3 ) throw  "Failed to load vkCreateSwapchainKHR";
+    //PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR1 = reinterpret_cast<PFN_vkCreateSwapchainKHR>( vkGetSwapcJjhdj3 );
+
+    logRun(" pre error 001 2  05005\n");
+    res = check->vkCreateSwapchainKHR(vulkanA.mDeviceLos, &swapCInfo, nullptr, &vulkanA.swapChainMain);
+
+    logRun(" pre error 001 2 \n");
+    cb(res);
+
+
+    PFN_vkVoidFunction vkGetSwrjSaGethdj3 = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetSwapchainImagesKHR");
+    if( !vkGetSwrjSaGethdj3 ) throw  "Failed to load vkGetSwapchainImagesKHR";
+    logRun(" pre error 001 3 \n");
+    uint32_t mSwapImCountL;
+    PFN_vkGetSwapchainImagesKHR vkGetSwapchainImagesKHR1 = reinterpret_cast<PFN_vkGetSwapchainImagesKHR>( vkGetSwrjSaGethdj3 );
+
+
+    res = vkGetSwapchainImagesKHR1(vulkanA.mDeviceLos, vulkanA.swapChainMain, &mSwapImCountL, nullptr);
+    logRun(" my swapCount chain == %d \n", mSwapImCountL);
+
+    VkImage *pSwapchainImages = new VkImage[mSwapImCountL];
+    res = vkGetSwapchainImagesKHR1(vulkanA.mDeviceLos, vulkanA.swapChainMain, &mSwapImCountL, pSwapchainImages);
+
+    cb(res);
+
+    SwapchainBuffer* mySwapBuffer = new SwapchainBuffer[mSwapImCountL];
+
+
+    //SwapchainBuffer* swapChinaBufferLos = new SwapchainBuffer[mSwapImCountL];
+
+     VkImageViewCreateInfo  imageViewCreatein = {};
+    imageViewCreatein.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    imageViewCreatein.pNext = nullptr;
+    imageViewCreatein.format = vulkanA.mSurfaceLosFormat.format;
+    imageViewCreatein.components.r = VK_COMPONENT_SWIZZLE_R;
+    imageViewCreatein.components.g = VK_COMPONENT_SWIZZLE_G;
+    imageViewCreatein.components.b = VK_COMPONENT_SWIZZLE_B;
+    imageViewCreatein.components.a = VK_COMPONENT_SWIZZLE_A;
+    imageViewCreatein.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageViewCreatein.subresourceRange.baseMipLevel = 0;
+    imageViewCreatein.subresourceRange.levelCount = 1;
+    imageViewCreatein.subresourceRange.baseArrayLayer = 0;
+    imageViewCreatein.subresourceRange.layerCount = 1;
+    imageViewCreatein.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    imageViewCreatein.flags = 0;
+
+     for( uint32_t i = 0; i < mSwapImCountL; i++){
+
+         mySwapBuffer[i].image = pSwapchainImages[i];
+         imageViewCreatein.image = pSwapchainImages[i];
+
+         res = check->vkCreateImageView(vulkanA.mDeviceLos, &imageViewCreatein, nullptr, &mySwapBuffer[i].view);
+         cb(res);
+     }
 
 
 
 
 
-
+    delete[] pSwapchainImages;
 
     // initDepthBuffers
+
+
+
+
+    PFN_vkVoidFunction getImegeRequi1 = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetImageMemoryRequirements");
+    if( !getImegeRequi1 ) throw  "Failed to load vkGetImageMemoryRequirements";
+
+    PFN_vkGetImageMemoryRequirements vkGetImageMemoryRequirements1 = reinterpret_cast<PFN_vkGetImageMemoryRequirements>( getImegeRequi1 );
+
+
+     DepthBufferLos* depthLosBuffer = new DepthBufferLos[mSwapImCountL];
+     for( int i = 0; i < mSwapImCountL; i++ ){
+
+         const VkFormat depthFormat = VK_FORMAT_D16_UNORM;
+         VkImageCreateInfo imageCreateInfo = {};
+         imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+         imageCreateInfo.pNext = nullptr;
+         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+         imageCreateInfo.format = depthFormat;
+         imageCreateInfo.extent = {LosWidth, LosHeight,1};
+         imageCreateInfo.mipLevels = 1;
+         imageCreateInfo.arrayLayers = 1;
+         imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+         imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+         imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+         imageCreateInfo.flags = 0;
+
+         VkImageViewCreateInfo imageViewCInfo = {};
+         imageViewCInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+         imageViewCInfo.pNext = nullptr;
+         imageViewCInfo.image = VK_NULL_HANDLE;
+         imageViewCInfo.format = depthFormat;
+         imageViewCInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+         imageViewCInfo.subresourceRange.baseMipLevel = 0;
+         imageViewCInfo.subresourceRange.levelCount = 1;
+         imageViewCInfo.subresourceRange.baseArrayLayer = 0;
+         imageViewCInfo.subresourceRange.layerCount = 1;
+         imageViewCInfo.flags = 0;
+         imageViewCInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+
+
+         VkMemoryRequirements  mem_requirements;
+         bool pass;
+
+          depthLosBuffer[i].format = depthFormat;
+        // vkGetImageMemoryRequirements()
+
+         res = check->vkCreateImage(vulkanA.mDeviceLos, &imageCreateInfo, nullptr, &depthLosBuffer[i].image);
+
+         vkGetImageMemoryRequirements1(vulkanA.mDeviceLos, depthLosBuffer[i].image, &mem_requirements);
+
+         VkMemoryAllocateInfo  memoryAllocateIn = {};
+         memoryAllocateIn.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+         memoryAllocateIn.pNext = nullptr;
+         memoryAllocateIn.allocationSize = 0;
+         memoryAllocateIn.memoryTypeIndex = 0;
+         memoryAllocateIn.allocationSize = mem_requirements.size;
+
+          pass = getMemoryTypeFromProperties(mem_requirements.memoryTypeBits, 0, &memoryAllocateIn.memoryTypeIndex);
+
+          // check pass
+          if(pass){
+              logRun(" all memory is ok \n");
+          }else {
+              logRun(" big error memory  vulkan ! \n");
+          }
+
+
+           res = check->vkAllocateMemory(vulkanA.mDeviceLos, &memoryAllocateIn, nullptr, &depthLosBuffer[i].mem);
+           cb(res);
+           res = check->vkBindImageMemory(vulkanA.mDeviceLos, depthLosBuffer[i].image, depthLosBuffer[i].mem, 0);
+           cb(res);
+           imageViewCInfo.image = depthLosBuffer[i].image;
+           res = check->vkCreateImageView(vulkanA.mDeviceLos, &imageViewCInfo, nullptr, &depthLosBuffer[i].view);
+           cb(res);
+
+     }
 
 
     // surface created
@@ -1068,13 +1343,43 @@ void LosMainVulkan::initializeMyVulkan(){
     // image created
 
 
+     // initCommandBuffers( )
+
+     VkCommandPoolCreateInfo  commandPoolCInfo = {};
+     commandPoolCInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+     commandPoolCInfo.pNext = nullptr;
+     commandPoolCInfo.queueFamilyIndex = queueIndex; // ???
+     commandPoolCInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+     res = check->vkCreateCommandPool(vulkanA.mDeviceLos, &commandPoolCInfo, nullptr, &lCommandPool);
+
+      VkCommandBufferAllocateInfo  commandBufferAllocateInfo = {};
+      commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+      commandBufferAllocateInfo.pNext = nullptr;
+      commandBufferAllocateInfo.commandPool = lCommandPool;
+      commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+      commandBufferAllocateInfo.commandBufferCount = 1;
+
+      for(uint32_t i = 0; i < mSwapImCountL; i++ ){
+
+          res = check->vkAllocateCommandBuffers(vulkanA.mDeviceLos, &commandBufferAllocateInfo, &mySwapBuffer[i].cmdBuffer);
+      }
+
+      res = vkAllocateCommandBuffers(vulkanA.mDeviceLos, &commandBufferAllocateInfo, &setupBuffeCommands);
+      cb(res);
+
+
+       // Init Sync !!
+
+
+        VkSemaphoreCreateInfo  semaphoreCreateInfo = {};
+     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semaphoreCreateInfo.pNext = nullptr;
+
      // destroy vkDevice, mSurfaceLos
      // mSurfaceLos
 
-
-
-
-
+    check->vkDestroySwapchainKHR(vulkanA.mDeviceLos, vulkanA.swapChainMain, nullptr);
     check->vkDestroyDevice(vulkanA.mDeviceLos, nullptr);
     check->vkDestroySurfaceKHR(vulkanA.mainInstance, mSurfaceLos, nullptr);
    // vkDestroyInstance(vulkanA.mainInstance, nullptr);
@@ -1135,9 +1440,16 @@ void LosMainVulkan::initializeMyVulkan(){
         } // end's while !
 
         //UpdateScreen();
+         Render();
     }
 }
 
+void LosMainVulkan::Render() noexcept{
+
+
+    losGame->preRender();
+
+}
 LosMainVulkan::~LosMainVulkan() {
 
 }

@@ -8,6 +8,12 @@
 
 class gameRender {
 
+public:
+     explicit gameRender();
+
+      static void preRender() ;
+private:
+     int a;
 };
 
 

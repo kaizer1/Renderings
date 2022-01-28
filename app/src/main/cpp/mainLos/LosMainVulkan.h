@@ -54,7 +54,7 @@ using namespace std;*/
 //    log<double, std::string>(10.75, "an important parameter");
 //}
 
-#define logRun(...) ((void)__android_log_print(ANDROID_LOG_INFO, "RunGame", __VA_ARGS__))
+
 
 #if(__ANDROID_API__ >= 30)
 #include <android/thermal.h>
@@ -76,11 +76,26 @@ public:
     VkDevice mDeviceLos;
     VkQueue mQueueLos;
     VkSurfaceFormatKHR mSurfaceLosFormat;
+    VkSwapchainKHR swapChainMain;
 };
 
 
 //extern PFN_vkCreateDebugReportCallbackEXT FpvkCreateDebugReportCallbackEXT;
 
+struct SwapchainBuffer
+{
+    VkImage image;
+    VkCommandBuffer cmdBuffer;
+    VkImageView view;
+};
+
+struct DepthBufferLos
+{
+    VkFormat format;
+    VkImage image;
+    VkDeviceMemory mem;
+    VkImageView view;
+};
 
 
 struct CheckVulkan {
@@ -106,7 +121,17 @@ public:
     //PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHRNew = LOAD_HARD(vkCreateAndroidSurfaceKHRNew);
     PFN_vkDestroyDevice vkDestroyDevice = LOAD_HARD(vkDestroyDevice);
     PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR = LOAD_HARD(vkDestroySurfaceKHR);
+    PFN_vkDestroySwapchainKHR vkDestroySwapchainKHR = LOAD_HARD(vkDestroySwapchainKHR);
     PFN_vkCreateDevice vkCreateDevice = LOAD_HARD(vkCreateDevice);
+    PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR = LOAD_HARD(vkCreateSwapchainKHR);
+    PFN_vkCreateImageView vkCreateImageView = LOAD_HARD(vkCreateImageView);
+    PFN_vkCreateImage vkCreateImage = LOAD_HARD(vkCreateImage);
+    PFN_vkAllocateMemory vkAllocateMemory = LOAD_HARD(vkAllocateMemory);
+    PFN_vkBindImageMemory vkBindImageMemory = LOAD_HARD(vkBindImageMemory);
+    PFN_vkCreateCommandPool vkCreateCommandPool = LOAD_HARD(vkCreateCommandPool);
+    PFN_vkAllocateCommandBuffers vkAllocateCommandBuffers = LOAD_HARD(vkAllocateCommandBuffers);
+
+
 
     void initializedAll(){
 
@@ -118,7 +143,15 @@ public:
         Load(vkDestroyInstance, "vkDestroyInstance");
         Load(vkDestroyDevice, "vkDestroyDevice");
         Load(vkDestroySurfaceKHR, "vkDestroySurfaceKHR");
+        Load(vkDestroySwapchainKHR, "vkDestroySwapchainKHR");
         Load(vkCreateDevice, "vkCreateDevice");
+        Load(vkCreateSwapchainKHR, "vkCreateSwapchainKHR");
+        Load(vkCreateImageView, "vkCreateImageView");
+        Load(vkCreateImage, "vkCreateImage");
+        Load(vkAllocateMemory, "vkAllocateMemory");
+        Load(vkBindImageMemory, "vkBindImageMemory");
+        Load(vkCreateCommandPool, "vkCreateCommandPool");
+        Load(vkAllocateCommandBuffers, "vkAllocateCommandBuffers");
 
         // vkGetInstanceProcAddr
         Load(vkGetInstanceProcAddr, "vkGetInstanceProcAddr");
@@ -218,10 +251,19 @@ public:
 
       const void looperMainVulkan();
 
+protected:
+    void Render() noexcept;
+     std::unique_ptr<gameRender> losGame;
+
+     VkCommandPool lCommandPool;
+     VkCommandBuffer setupBuffeCommands;
 private:
 
     void inputWrapper(int32_t cmd);
     void initializeMyVulkan();
+
+    uint32_t LosWidth;
+    uint32_t LosHeight;
 };
 
 

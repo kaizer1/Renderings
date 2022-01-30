@@ -19,6 +19,8 @@ android {
       //  testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
+                // -fbuiltin-module-map
+                // -fmodules -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7956693\sources\cxx-stl\llvm-libc++\include\module.modulemap
                 cppFlags "-std=c++20 -Ofast -O3 -ftree-vectorize" // -Ofast  -fsanitize=memory
             }
         }

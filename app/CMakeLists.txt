@@ -33,6 +33,7 @@ add_library( renderingsLos  SHARED
         src/main/cpp/mainLos/LosMainVulkan.cpp
         src/main/cpp/mainLos/assetsLos.c
         src/main/cpp/gameRender.cpp
+        src/main/cpp/Foolos.cpp
         )
 
 

@@ -2,9 +2,33 @@
 // Created by loskutnikov on 24.01.2022.
 //
 
+
+//import Foo;
+//import thread;
+
+
 #include <cassert>
 #include "LosMainVulkan.h"
 #include "logLos.h"
+
+
+#include <vector>
+#include <string>
+
+#include <thread>
+#include <concepts>
+#include <experimental/coroutine>
+#include <experimental/algorithm>
+#include <execution>
+
+#include <experimental/memory_resource>
+
+//#include <ranges>
+//#include <thread>
+//#include "module.modulemap"
+
+
+
 
 inline void cb(VkResult myResult ) noexcept {
 
@@ -348,10 +372,6 @@ VKAPI_ATTR VkBool32 VKAPI_CALL genericDebugCallback(
             break;
     }
 
-
-
-
-
     return VK_FALSE;
 }
 
@@ -407,6 +427,7 @@ void LosMainVulkan::inputWrapper(int32_t cmd)
             break;
         case APP_CMD_TERM_WINDOW:
             logRun("APP_CMD_TERM_WINDOW \n");
+            PreDestroyAll();
             //has_focus_ = false;
             // renderWork3->~RenderExampleGo();
             // renderWork3->~PreRenderCalss();
@@ -595,6 +616,62 @@ Job prepareJob() {
 };*/
 
 //#include <aaudio/aa>
+#include <atomic>
+#include <semaphore>
+#include <barrier>
+#include <latch>
+//#include <experimental/stop_token>
+#include <thread>
+//#include <experimental/source_location>
+//#include <functional>
+#include <concepts>
+//#include <experimental/views>
+
+template <typename T>
+concept Integral = std::is_integral<T>::value;
+
+Integral auto gcd(Integral auto a, Integral auto b){
+     if (b == 0 ) return a;
+     else return gcd(b, a % b);
+}
+
+
+template <typename T>
+requires Integral<T>
+  T gcd(T a, T b){
+       if (b == 0) return a;
+       else return gcd(b, a & b);
+  }
+
+//auto plusLambda = [] (int a, int b){
+//    return a + b;
+//};
+
+constexpr double powera (double b, int x){
+
+    if ( std::is_constant_evaluated() && !(b == 0.0)){
+        //logRun( "is constant_ evaluated \n");
+         double r = 1;
+
+         return r;
+    }
+
+    double h = 2.0;
+    return h;
+}
+consteval int swqt (int n ){
+      return n * 2;
+}
+
+struct Explicit {
+
+    template <typename T>
+    explicit Explicit(T t){
+        logRun(" my explicit t == %s ", t);
+    }
+
+};
+
 
 void LosMainVulkan::initializeMyVulkan() {
 
@@ -602,6 +679,43 @@ void LosMainVulkan::initializeMyVulkan() {
     const int coreSize = android_getCpuCount();
      logRun(" my core size == %d \n", coreSize);
 
+       //  std::atomic_flag
+       // std::atomic_flag  losFlag; // all ok
+        // std::atomic_ref sdf; // No
+
+//         template <typename T>
+//         std::atomic<std::shared_ptr<T>> asd;  // ok consructions
+
+         //using binary_semaphore =  std::counting_semaphore<1>; // ok work
+
+           //  std::latch a1; // ok exists
+           // std::barrier b1; // ok exists
+
+            // std::stop_source adf; // no
+           //   std::stop_callback sdfw;
+
+          // std::jthread smilleThread;
+
+        //   auto tt = std::bind_front(plusLambda, 2000);
+
+     auto losInte = gcd(5 , 10);
+      logRun(" y concept first == %d \n", losInte);
+
+       constexpr auto myG = swqt(3);
+       // int myGG3 = swqt(10); // not error !!
+        logRun(" my first consteval == %d \n", myG);
+
+    Explicit exp1{"aaa go nigger's "};
+
+       auto gooo = [] <typename T> (std::vector<T> const& veclos){
+           logRun(" my vector values !! \n");
+       };
+
+        
+
+       constexpr double myDound =  powera(3.0f, 9);
+        double easy = powera(3.0f, 5);
+     logRun(" my double == %f and notConpExp = %f  \n", myDound, easy);
 
        auto start = std::chrono::system_clock::now();
 
@@ -609,6 +723,9 @@ void LosMainVulkan::initializeMyVulkan() {
 
        std::chrono::duration<double> dur = std::chrono::system_clock::now() - start;
         logRun ( "time: %f \n", dur.count() ); // 0.261780 - 1000 threads
+
+
+
 
         /*logRun(" my version  C++ == %d \n", _LIBCPP_STD_VER);
          if constexpr (_LIBCPP_HAS_PARALLEL_ALGORITHMS){
@@ -652,8 +769,11 @@ void LosMainVulkan::initializeMyVulkan() {
 
 
 
-    myVulkan vulkanA = myVulkan();
+    vulkanA = myVulkan();
     losGame = std::make_unique<gameRender>();
+
+     uint32_t aThread = std::thread::hardware_concurrency(); // max thread work ok !!
+     logRun(" my thread concurrency == %d \n", aThread);
 
     bool debugUtilsExists = false;
     bool debugReport = false;
@@ -678,7 +798,8 @@ void LosMainVulkan::initializeMyVulkan() {
 
 
 
-    CheckVulkan *check = new CheckVulkan();
+    //CheckVulkan *check = new CheckVulkan();
+    check = std::make_unique<CheckVulkan>();
     check->initializedAll();
 
     VkResult res;
@@ -873,7 +994,7 @@ void LosMainVulkan::initializeMyVulkan() {
     cb(res);
 
 
-    VkDebugReportCallbackEXT cb1;
+
     // VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT
     VkDebugReportCallbackCreateInfoEXT callback1 = {
             VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT,
@@ -905,11 +1026,7 @@ void LosMainVulkan::initializeMyVulkan() {
     PFN_vkCreateDebugReportCallbackEXT FpvkCreateDebugReportCallbackEXT = reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT>( temp_fp );
 
 
-    PFN_vkVoidFunction temp_fp2 = check->vkGetInstanceProcAddr(vulkanA.mainInstance,
-                                                               "vkDestroyDebugReportCallbackEXT");
-    if (!temp_fp2) throw "Failed to load vkCreateDebugReportCallbackEXT";
 
-    PFN_vkDestroyDebugReportCallbackEXT FpvkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>( temp_fp2 );
     FpvkCreateDebugReportCallbackEXT(vulkanA.mainInstance, &callback1, nullptr, &cb1);
 
 
@@ -991,8 +1108,7 @@ void LosMainVulkan::initializeMyVulkan() {
 
     PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHR1 = reinterpret_cast<PFN_vkCreateAndroidSurfaceKHR>( temp_fp2DeCreaWindo );
 
-    VkSurfaceKHR mSurfaceLos;
-    VkSurfaceFormatKHR mSurfaceFormat;
+
     logRun(" sdf   pre this 22!! ");
     // check->activateAndroid();
 
@@ -1105,12 +1221,6 @@ void LosMainVulkan::initializeMyVulkan() {
     deviceCreateInfo.ppEnabledExtensionNames = newExtenHonor;
 
 
-   // PFN_vkVoidFunction kCeDevies = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkCreateDevice" );
-   // if( !kCeDevies ) throw  "Failed to load vkCreateDevice";
-
-   // PFN_vkCreateDevice vkCreateDevice1 = reinterpret_cast<PFN_vkCreateDevice>( kCeDevies );
-
-    // create Device
     res = check->vkCreateDevice(myPhysicalDevice, &deviceCreateInfo, nullptr, &vulkanA.mDeviceLos);
      cb(res);
 
@@ -1209,7 +1319,7 @@ void LosMainVulkan::initializeMyVulkan() {
     PFN_vkVoidFunction vkGetSwrjSaGethdj3 = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetSwapchainImagesKHR");
     if( !vkGetSwrjSaGethdj3 ) throw  "Failed to load vkGetSwapchainImagesKHR";
     logRun(" pre error 001 3 \n");
-    uint32_t mSwapImCountL;
+
     PFN_vkGetSwapchainImagesKHR vkGetSwapchainImagesKHR1 = reinterpret_cast<PFN_vkGetSwapchainImagesKHR>( vkGetSwrjSaGethdj3 );
 
 
@@ -1221,8 +1331,8 @@ void LosMainVulkan::initializeMyVulkan() {
 
     cb(res);
 
-    SwapchainBuffer* mySwapBuffer = new SwapchainBuffer[mSwapImCountL];
-
+      mySwapBuffer = new SwapchainBuffer[mSwapImCountL];
+   // mySwapBuffer = std::make_unique<SwapchainBuffer>[mSwapImCountL];
 
     //SwapchainBuffer* swapChinaBufferLos = new SwapchainBuffer[mSwapImCountL];
 
@@ -1251,16 +1361,9 @@ void LosMainVulkan::initializeMyVulkan() {
          cb(res);
      }
 
-
-
-
-
     delete[] pSwapchainImages;
 
     // initDepthBuffers
-
-
-
 
     PFN_vkVoidFunction getImegeRequi1 = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkGetImageMemoryRequirements");
     if( !getImegeRequi1 ) throw  "Failed to load vkGetImageMemoryRequirements";
@@ -1268,7 +1371,7 @@ void LosMainVulkan::initializeMyVulkan() {
     PFN_vkGetImageMemoryRequirements vkGetImageMemoryRequirements1 = reinterpret_cast<PFN_vkGetImageMemoryRequirements>( getImegeRequi1 );
 
 
-     DepthBufferLos* depthLosBuffer = new DepthBufferLos[mSwapImCountL];
+    depthLosBuffer = new DepthBufferLos[mSwapImCountL];
      for( int i = 0; i < mSwapImCountL; i++ ){
 
          const VkFormat depthFormat = VK_FORMAT_D16_UNORM;
@@ -1360,34 +1463,140 @@ void LosMainVulkan::initializeMyVulkan() {
       commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
       commandBufferAllocateInfo.commandBufferCount = 1;
 
+
+      // TODO: vkAllocateCommandBuffers
+
+
       for(uint32_t i = 0; i < mSwapImCountL; i++ ){
 
           res = check->vkAllocateCommandBuffers(vulkanA.mDeviceLos, &commandBufferAllocateInfo, &mySwapBuffer[i].cmdBuffer);
       }
 
-      res = vkAllocateCommandBuffers(vulkanA.mDeviceLos, &commandBufferAllocateInfo, &setupBuffeCommands);
+      res = check->vkAllocateCommandBuffers(vulkanA.mDeviceLos, &commandBufferAllocateInfo, &setupBuffeCommands);
       cb(res);
 
 
-       // Init Sync !!
+       // TODO: Init Sync !!
 
 
         VkSemaphoreCreateInfo  semaphoreCreateInfo = {};
      semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    semaphoreCreateInfo.pNext = nullptr;
+     semaphoreCreateInfo.pNext = nullptr;
+     semaphoreCreateInfo.flags = 0;
 
-     // destroy vkDevice, mSurfaceLos
-     // mSurfaceLos
+      res = check->vkCreateSemaphore(vulkanA.mDeviceLos, &semaphoreCreateInfo, nullptr, &backBufferSema);
 
+      res =  check->vkCreateSemaphore(vulkanA.mDeviceLos, &semaphoreCreateInfo, nullptr, &renderCompleteSema);
+      cb(res);
+
+      VkFenceCreateInfo fenceCreateInfo = {};
+      fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+      res = check->vkCreateFence(vulkanA.mDeviceLos, &fenceCreateInfo, nullptr, &fenceLos);
+      cb(res);
+
+
+       // initSwapchainLayout
+       for (uint32_t i = 0; i < mSwapImCountL; i++) {
+
+            VkCommandBuffer &cmdBuffer = mySwapBuffer[i].cmdBuffer;
+            res = check->vkResetCommandBuffer(cmdBuffer, 0);
+            cb(res);
+
+            VkCommandBufferInheritanceInfo  cmdInheritance = {};
+           cmdInheritance.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+           cmdInheritance.pNext = nullptr;
+           cmdInheritance.renderPass = VK_NULL_HANDLE;
+           cmdInheritance.subpass = 0;
+           cmdInheritance.framebuffer = VK_NULL_HANDLE;
+           cmdInheritance.occlusionQueryEnable = VK_FALSE;
+           cmdInheritance.queryFlags = 0;
+           cmdInheritance.pipelineStatistics = 0;
+
+           VkCommandBufferBeginInfo cmdBeginInfo = {};
+           cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+           cmdBeginInfo.pNext = nullptr;
+           cmdBeginInfo.flags = 0;
+           cmdBeginInfo.pInheritanceInfo = &cmdInheritance;
+
+           res = check->vkBeginCommandBuffer(cmdBuffer, &cmdBeginInfo);
+           cb(res);
+
+           // SetImageLayoutLos
+           SetImageLayoutLos( mySwapBuffer[i].image, cmdBuffer, VK_IMAGE_ASPECT_COLOR_BIT,  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+           SetImageLayoutLos( depthLosBuffer[i].image, cmdBuffer, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+
+           res = check->vkEndCommandBuffer(cmdBuffer);
+           cb(res);
+
+           const VkPipelineStageFlags waitDsgMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+           VkSubmitInfo submitInfo = {};
+           submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+           submitInfo.pNext = nullptr;
+           submitInfo.waitSemaphoreCount = 0;
+           submitInfo.pWaitSemaphores = nullptr;
+           submitInfo.pWaitDstStageMask = &waitDsgMask;
+           submitInfo.commandBufferCount = 1;
+           submitInfo.pCommandBuffers = &mySwapBuffer[i].cmdBuffer;
+           submitInfo.signalSemaphoreCount = 0;
+           submitInfo.pSignalSemaphores = nullptr;
+
+           res = check->vkQueueSubmit( vulkanA.mQueueLos, 1, &submitInfo, fenceLos);
+           cb(res);
+           res = check->vkWaitForFences(vulkanA.mDeviceLos, 1, &fenceLos, true, 0xFFFFFFFF);
+           cb(res);
+           res = check->vkResetFences(vulkanA.mDeviceLos, 1, &fenceLos);
+           cb(res);
+       }
+
+
+
+
+
+
+
+
+
+}
+
+
+void LosMainVulkan::PreDestroyAll() noexcept{
+
+     VkResult res;
+
+
+    PFN_vkVoidFunction temp_fp2 = check->vkGetInstanceProcAddr(vulkanA.mainInstance,
+                                                               "vkDestroyDebugReportCallbackEXT");
+    if (!temp_fp2) throw "Failed to load vkCreateDebugReportCallbackEXT";
+
+    PFN_vkDestroyDebugReportCallbackEXT FpvkDestroyDebugReportCallbackEXT = reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT>( temp_fp2 );
+
+    for (uint32_t i = 0; i < mSwapImCountL; i++)
+    {
+        check->vkFreeCommandBuffers(vulkanA.mDeviceLos, lCommandPool, 1, &mySwapBuffer[i].cmdBuffer);
+        check->vkDestroyImageView  (vulkanA.mDeviceLos, mySwapBuffer[i].view,  nullptr);
+        check->vkDestroyImage( vulkanA.mDeviceLos, depthLosBuffer[i].image,     nullptr);
+        check->vkDestroyImageView(vulkanA.mDeviceLos, depthLosBuffer[i].view,      nullptr);
+        check->vkFreeMemory( vulkanA.mDeviceLos, depthLosBuffer[i].mem,       nullptr);
+    }
+    // VkCommandBuffer destroy , VkSemaphore , VkFence, VkDeviceMemory, VkImage, VkImageView, VkCommandPool
+    delete []  mySwapBuffer;
+    delete []  depthLosBuffer;
     check->vkDestroySwapchainKHR(vulkanA.mDeviceLos, vulkanA.swapChainMain, nullptr);
+
+
+    check->vkDestroyCommandPool(vulkanA.mDeviceLos, lCommandPool, nullptr);
+    check->vkDestroySemaphore(vulkanA.mDeviceLos, backBufferSema, nullptr);
+    check->vkDestroySemaphore(vulkanA.mDeviceLos, renderCompleteSema, nullptr);
+    check->vkDestroyFence(vulkanA.mDeviceLos, fenceLos, nullptr);
+
+
+
     check->vkDestroyDevice(vulkanA.mDeviceLos, nullptr);
     check->vkDestroySurfaceKHR(vulkanA.mainInstance, mSurfaceLos, nullptr);
-   // vkDestroyInstance(vulkanA.mainInstance, nullptr);
+    // vkDestroyInstance(vulkanA.mainInstance, nullptr);
 
     FpvkDestroyDebugReportCallbackEXT(vulkanA.mainInstance, cb1, nullptr);
     logRun("post loading vkCreateDebugReportCallbackEXT \n");
-
-
 
     cb(res);
 
@@ -1406,8 +1615,93 @@ void LosMainVulkan::initializeMyVulkan() {
     check->vkDestroyInstance(vulkanA.mainInstance, nullptr);
     vulkanA.mainInstance = VK_NULL_HANDLE;
 
+}
+
+
+void LosMainVulkan::SetImageLayoutLos(VkImage image, VkCommandBuffer cmdBuffer, VkImageAspectFlags aspect,
+                       VkImageLayout oldLayout, VkImageLayout newLayout, VkPipelineStageFlags scrMask,
+                       VkPipelineStageFlags  dstMask, uint32_t mipLevel, uint32_t mipLevelCount){
+
+
+    VkImageMemoryBarrier imageMemoryBarrier = {};
+    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    imageMemoryBarrier.pNext = nullptr;
+    imageMemoryBarrier.oldLayout = oldLayout;
+    imageMemoryBarrier.newLayout = newLayout;
+    imageMemoryBarrier.image = image;
+    imageMemoryBarrier.subresourceRange.aspectMask = aspect;
+    imageMemoryBarrier.subresourceRange.baseMipLevel = mipLevel;
+    imageMemoryBarrier.subresourceRange.levelCount = mipLevelCount;
+    imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+    imageMemoryBarrier.subresourceRange.layerCount = 1;
+    imageMemoryBarrier.srcAccessMask = 0;
+    imageMemoryBarrier.dstAccessMask = 0;
+    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+
+    if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+    {
+        imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    }
+    if (oldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+    {
+        imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    }
+    if (oldLayout == VK_IMAGE_LAYOUT_PREINITIALIZED)
+    {
+        imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+    }
+    if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+    {
+        imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    }
+    if (oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    {
+        imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    }
+    if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+    {
+        imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    }
+
+    if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+    {
+        // Ensures reads can be made
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    }
+    if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+    {
+        // Ensures writes can be made
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    }
+    if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+    {
+        // Ensure writes have completed
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    }
+    if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+    {
+        // Ensure writes have completed
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    }
+    if (newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    {
+        // Make sure any Copy or CPU writes to image are flushed
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+    }
+    if (newLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+    {
+        imageMemoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    }
+
+    check->vkCmdPipelineBarrier(cmdBuffer, scrMask /*VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT*/, dstMask /*VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT*/, 0, 0, NULL, 0, NULL, 1, &imageMemoryBarrier);
 
 }
+
+
+
+
 
 
  const void  LosMainVulkan::looperMainVulkan(){

@@ -2,8 +2,12 @@
 
 #pragma once
 
+//import std_config;
+//import cstring;
+//import string;
 
 #include <jni.h>
+
 #include <string>
 #include <dlfcn.h>
 #include <los_android_native_app_glue.h>
@@ -17,16 +21,11 @@
 #include <vulkan/vulkan_core.h>
 #include <android/log.h>
 #include <android/native_window.h>
-#include <vector>
-#include <string>
 
-#include <thread>
-#include <concepts>
-#include <experimental/coroutine>
-#include <experimental/algorithm>
-#include <execution>
 
-#include <experimental/memory_resource>
+
+
+
 #include <vulkan/vulkan_android.h>
 
 
@@ -130,6 +129,23 @@ public:
     PFN_vkBindImageMemory vkBindImageMemory = LOAD_HARD(vkBindImageMemory);
     PFN_vkCreateCommandPool vkCreateCommandPool = LOAD_HARD(vkCreateCommandPool);
     PFN_vkAllocateCommandBuffers vkAllocateCommandBuffers = LOAD_HARD(vkAllocateCommandBuffers);
+    PFN_vkCreateSemaphore vkCreateSemaphore = LOAD_HARD(vkCreateSemaphore);
+    PFN_vkCreateFence vkCreateFence = LOAD_HARD(vkCreateFence);
+    PFN_vkResetCommandBuffer vkResetCommandBuffer = LOAD_HARD(vkResetCommandBuffer);
+    PFN_vkBeginCommandBuffer vkBeginCommandBuffer = LOAD_HARD(vkBeginCommandBuffer);
+    PFN_vkEndCommandBuffer vkEndCommandBuffer = LOAD_HARD(vkEndCommandBuffer);
+    PFN_vkQueueSubmit vkQueueSubmit = LOAD_HARD(vkQueueSubmit);
+    PFN_vkResetFences vkResetFences = LOAD_HARD(vkResetFences);
+    PFN_vkWaitForFences vkWaitForFences = LOAD_HARD(vkWaitForFences);
+    PFN_vkCmdPipelineBarrier vkCmdPipelineBarrier = LOAD_HARD(vkCmdPipelineBarrier);
+    PFN_vkFreeCommandBuffers vkFreeCommandBuffers = LOAD_HARD(vkFreeCommandBuffers);
+    PFN_vkDestroyImageView vkDestroyImageView = LOAD_HARD(vkDestroyImageView);
+    PFN_vkDestroyImage vkDestroyImage = LOAD_HARD(vkDestroyImage);
+    PFN_vkFreeMemory vkFreeMemory = LOAD_HARD(vkFreeMemory);
+    PFN_vkDestroyCommandPool vkDestroyCommandPool = LOAD_HARD(vkDestroyCommandPool);
+    PFN_vkDestroySemaphore vkDestroySemaphore = LOAD_HARD(vkDestroySemaphore);
+    PFN_vkDestroyFence vkDestroyFence = LOAD_HARD(vkDestroyFence);
+
 
 
 
@@ -152,6 +168,22 @@ public:
         Load(vkBindImageMemory, "vkBindImageMemory");
         Load(vkCreateCommandPool, "vkCreateCommandPool");
         Load(vkAllocateCommandBuffers, "vkAllocateCommandBuffers");
+        Load(vkCreateSemaphore, "vkCreateSemaphore");
+        Load(vkCreateFence, "vkCreateFence");
+        Load(vkResetCommandBuffer, "vkResetCommandBuffer");
+        Load(vkBeginCommandBuffer, "vkBeginCommandBuffer");
+        Load(vkEndCommandBuffer, "vkEndCommandBuffer");
+        Load(vkQueueSubmit, "vkQueueSubmit");
+        Load(vkResetFences, "vkResetFences");
+        Load(vkWaitForFences, "vkWaitForFences");
+        Load(vkCmdPipelineBarrier, "vkCmdPipelineBarrier");
+        Load(vkFreeCommandBuffers, "vkFreeCommandBuffers");
+        Load(vkDestroyImageView, "vkDestroyImageView");
+        Load(vkDestroyImage, "vkDestroyImage");
+        Load(vkFreeMemory, "vkFreeMemory");
+        Load(vkDestroyCommandPool, "vkDestroyCommandPool");
+        Load(vkDestroySemaphore, "vkDestroySemaphore");
+        Load(vkDestroyFence, "vkDestroyFence");
 
         // vkGetInstanceProcAddr
         Load(vkGetInstanceProcAddr, "vkGetInstanceProcAddr");
@@ -251,12 +283,30 @@ public:
 
       const void looperMainVulkan();
 
+    VkDebugReportCallbackEXT cb1;
+
 protected:
     void Render() noexcept;
      std::unique_ptr<gameRender> losGame;
 
      VkCommandPool lCommandPool;
      VkCommandBuffer setupBuffeCommands;
+
+     VkSemaphore backBufferSema;
+     VkSemaphore renderCompleteSema;
+     VkFence fenceLos;
+
+    //SwapchainBuffer* mySwapBuffer
+    SwapchainBuffer* mySwapBuffer = nullptr;
+    uint32_t mSwapImCountL;
+    DepthBufferLos* depthLosBuffer = nullptr;
+    void SetImageLayoutLos(VkImage image, VkCommandBuffer cmdBuffer, VkImageAspectFlags aspect,
+                            VkImageLayout oldLayout, VkImageLayout newLayout, VkPipelineStageFlags scrMask=VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                            VkPipelineStageFlags  dstMask=VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, uint32_t mipLevel=0, uint32_t mipLevelCount = 1);
+
+
+    VkSurfaceKHR mSurfaceLos;
+    VkSurfaceFormatKHR mSurfaceFormat;
 private:
 
     void inputWrapper(int32_t cmd);
@@ -264,6 +314,12 @@ private:
 
     uint32_t LosWidth;
     uint32_t LosHeight;
+    myVulkan vulkanA;
+
+    //  CheckVulkan *check
+    std::unique_ptr<CheckVulkan> check;
+
+    void PreDestroyAll() noexcept;
 };
 
 

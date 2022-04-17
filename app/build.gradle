@@ -4,15 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     //buildToolsVersion "31.0.0 rc1"
 
     defaultConfig {
         applicationId "com.sergey.los.freelanceideas.renderings"
         minSdkVersion 24
-        targetSdkVersion 31
-
-
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
 
@@ -20,13 +18,18 @@ android {
         externalNativeBuild {
             cmake {
                 // -fbuiltin-module-map
+                // ok module -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7856742\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\c++\v1\module.modulemap
                 // -fmodules -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7956693\sources\cxx-stl\llvm-libc++\include\module.modulemap
-                cppFlags "-std=c++20 -Ofast -O3 -ftree-vectorize" // -Ofast  -fsanitize=memory
+                // -fmodule-map-file=Q:\AndroidProject\Renderings\app\src\main\cpp\losmod.modulemap - ok too ( but error also )
+                cppFlags "-std=c++20 -fmodules" // -Ofast  -fsanitize=memory
+               // -fmodules -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7856742\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\c++\v1\module.modulemap
+           // -fmodules -fmodule-map-file=Q:\AndroidProject\Renderings\app\src\main\cpp\losmod.modulemap
+                // -Ofast -O3 -ftree-vectorize
             }
         }
 
         ndk { abiFilters 'arm64-v8a' }
-        ndkVersion '24.0.7956693'  // was 23.1.7779620
+        ndkVersion '24.0.7856742'  // was 23.1.7779620
     }
 
 
@@ -66,17 +69,18 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            version "3.18.1" // was 3.18.1
+            version "3.22.0" // was 3.18.1
             //arguments "-DHWASAN=1"
         }
     }
 
     sourceSets {
-        main {
-            jniLibs {
-                srcDir "Q:\\AndroidSDK\\ndk\\22.0.7026061\\sources\\third_party\\vulkan\\src\\build-android\\jniLibs"
-            }
-        }
+//        main {
+//            jniLibs {
+//              //  srcDir "Q:\\AndroidSDK\\ndk\\22.0.7026061\\sources\\third_party\\vulkan\\src\\build-android\\jniLibs"
+//              //
+//            }
+//        }
     }
 
 
@@ -87,7 +91,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    ndkVersion '24.0.7956693 rc2'
+    ndkVersion '24.0.7856742'
 }
 
 dependencies {

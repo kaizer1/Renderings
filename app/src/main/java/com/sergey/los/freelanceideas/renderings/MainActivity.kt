@@ -3,6 +3,7 @@ package com.sergey.los.freelanceideas.renderings
 
 import android.app.NativeActivity
 import android.os.Bundle
+import android.view.Display
 
 class MainActivity : NativeActivity() {
 
@@ -12,6 +13,7 @@ class MainActivity : NativeActivity() {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_main)
 
+       //  Display.getSupportModes()
     }
 
     /**

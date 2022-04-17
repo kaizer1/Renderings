@@ -22,7 +22,7 @@
 #include <android/log.h>
 #include <android/native_window.h>
 
-
+#include "AudioMain.h"
 
 
 
@@ -96,6 +96,15 @@ struct DepthBufferLos
     VkImageView view;
 };
 
+struct Vertices
+{
+    VkBuffer buf;
+    VkDeviceMemory mem;
+    VkPipelineVertexInputStateCreateInfo vi;
+    VkVertexInputBindingDescription      vi_bindings[1];
+    VkVertexInputAttributeDescription    vi_attrs[2];
+};
+
 
 struct CheckVulkan {
 
@@ -145,7 +154,25 @@ public:
     PFN_vkDestroyCommandPool vkDestroyCommandPool = LOAD_HARD(vkDestroyCommandPool);
     PFN_vkDestroySemaphore vkDestroySemaphore = LOAD_HARD(vkDestroySemaphore);
     PFN_vkDestroyFence vkDestroyFence = LOAD_HARD(vkDestroyFence);
-
+    PFN_vkCreateRenderPass vkCreateRenderPass = LOAD_HARD(vkCreateRenderPass);
+    PFN_vkCreateShaderModule vkCreateShaderModule = LOAD_HARD(vkCreateShaderModule);
+    PFN_vkCreateGraphicsPipelines vkCreateGraphicsPipelines = LOAD_HARD(vkCreateGraphicsPipelines);
+    PFN_vkCreatePipelineCache vkCreatePipelineCache = LOAD_HARD(vkCreatePipelineCache);
+    PFN_vkDestroyPipelineCache vkDestroyPipelineCache = LOAD_HARD(vkDestroyPipelineCache);
+    PFN_vkDestroyShaderModule vkDestroyShaderModule = LOAD_HARD(vkDestroyShaderModule);
+    PFN_vkCreateBuffer vkCreateBuffer = LOAD_HARD(vkCreateBuffer);
+    PFN_vkGetBufferMemoryRequirements vkGetBufferMemoryRequirements = LOAD_HARD(vkGetBufferMemoryRequirements);
+    PFN_vkQueuePresentKHR vkQueuePresentKHR = LOAD_HARD(vkQueuePresentKHR);
+    PFN_vkAcquireNextImageKHR vkAcquireNextImageKhr = LOAD_HARD(vkAcquireNextImageKhr);
+    PFN_vkCmdBeginRenderPass vkCmdBeginRenderPass = LOAD_HARD(vkCmdBeginRenderPass);
+    PFN_vkCmdBindPipeline vkCmdBindPipeline = LOAD_HARD(vkCmdBindPipeline);
+    PFN_vkCmdEndRenderPass vkCmdEndRenderPass = LOAD_HARD(vkCmdEndRenderPass);
+    PFN_vkCmdDraw vkCmdDraw = LOAD_HARD(vkCmdDraw);
+    PFN_vkCmdBindVertexBuffers vkCmdBindVertexBuffers = LOAD_HARD(vkCmdBindVertexBuffers);
+    PFN_vkMapMemory vkMapMemory = LOAD_HARD(vkMapMemory);
+    PFN_vkUnmapMemory vkUnmapMemory = LOAD_HARD(vkUnmapMemory);
+    PFN_vkBindBufferMemory vkBindBufferMemory = LOAD_HARD(vkBindBufferMemory);
+    PFN_vkCreateFramebuffer vkCreateFramebuffer = LOAD_HARD(vkCreateFramebuffer);
 
 
 
@@ -184,8 +211,28 @@ public:
         Load(vkDestroyCommandPool, "vkDestroyCommandPool");
         Load(vkDestroySemaphore, "vkDestroySemaphore");
         Load(vkDestroyFence, "vkDestroyFence");
+        Load(vkCreateRenderPass, "vkCreateRenderPass");
+        Load(vkCreateShaderModule, "vkCreateShaderModule");
+        Load(vkCreateGraphicsPipelines, "vkCreateGraphicsPipelines");
+        Load(vkCreatePipelineCache, "vkCreatePipelineCache");
+        Load(vkCreateBuffer, "vkCreateBuffer");
+        Load(vkGetBufferMemoryRequirements, "vkGetBufferMemoryRequirements");
+        Load(vkQueuePresentKHR, "vkQueuePresentKHR");
+        Load(vkAcquireNextImageKhr, "vkAcquireNextImageKhr");
+        Load(vkCmdBeginRenderPass, "vkCmdBeginRenderPass");
+        Load(vkCmdBindPipeline, "vkCmdBindPipeline");
+        Load(vkCmdEndRenderPass, "vkCmdEndRenderPass");
+        Load(vkCmdDraw, "vkCmdDraw");
+        Load(vkCmdBindVertexBuffers, "vkCmdBindVertexBuffers");
+        Load(vkMapMemory, "vkMapMemory");
+        Load(vkUnmapMemory, "vkUnmapMemory");
+        Load(vkBindBufferMemory, "vkBindBufferMemory");
+        Load(vkCreateFramebuffer, "vkCreateFramebuffer");
+
 
         // vkGetInstanceProcAddr
+        Load(vkDestroyPipelineCache, "vkDestroyPipelineCache");
+        Load(vkDestroyShaderModule, "vkDestroyShaderModule");
         Load(vkGetInstanceProcAddr, "vkGetInstanceProcAddr");
 
 
@@ -285,6 +332,9 @@ public:
 
     VkDebugReportCallbackEXT cb1;
 
+    void PresentBBuffers();
+    void SetNextBuf();
+
 protected:
     void Render() noexcept;
      std::unique_ptr<gameRender> losGame;
@@ -307,6 +357,16 @@ protected:
 
     VkSurfaceKHR mSurfaceLos;
     VkSurfaceFormatKHR mSurfaceFormat;
+    Vertices mVerticesL;
+    VkDescriptorSetLayout lDescriptor;
+    VkPipelineLayout lPipelineLos;
+    VkPipeline mPipe;
+    VkRenderPass losRenderPass;
+    VkFramebuffer*  losFrameBuff;
+    VkShaderModule createShaderLos(const uint32_t* code, uint32_t size);
+    //VkPipelineLayout lPipelineLosLayout;
+    uint32_t swapchainCurrentIndex;
+
 private:
 
     void inputWrapper(int32_t cmd);
@@ -320,6 +380,8 @@ private:
     std::unique_ptr<CheckVulkan> check;
 
     void PreDestroyAll() noexcept;
+    bool initialize_isOk = false;
+
 };
 
 

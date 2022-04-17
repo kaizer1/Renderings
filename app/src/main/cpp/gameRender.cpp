@@ -18,5 +18,5 @@ gameRender::gameRender() : a(1)
 void gameRender::preRender() {
 
 
-    logRun(" my render's \n");
+    //logRun(" my render's \n");
 }

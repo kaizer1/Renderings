@@ -22,12 +22,19 @@
 #include <execution>
 
 #include <experimental/memory_resource>
+#include "ShaderData.h"
 
 //#include <ranges>
 //#include <thread>
 //#include "module.modulemap"
 
+#include <bit>
 
+
+
+
+
+#define VERTEX_BUFFER_BIND_ID_LOS 0
 
 
 inline void cb(VkResult myResult ) noexcept {
@@ -291,6 +298,10 @@ std::string_view to_string( VkDebugReportObjectTypeEXT o ){
         default: return "unrecognized";
     }
 }
+
+
+
+
 
 
 VkPhysicalDeviceMemoryProperties myPhysicalDeviceMemoryPropertises2;
@@ -625,7 +636,9 @@ Job prepareJob() {
 //#include <experimental/source_location>
 //#include <functional>
 #include <concepts>
+//#include <experimental/syncstream>
 //#include <experimental/views>
+#include <condition_variable>
 
 template <typename T>
 concept Integral = std::is_integral<T>::value;
@@ -672,6 +685,60 @@ struct Explicit {
 
 };
 
+struct SendOther {
+
+public :
+      explicit SendOther( int sends) {
+
+       logRun(" my other send's \n");
+
+   }
+
+    ~SendOther() = default;
+
+private:
+
+};
+
+std::vector<int> simpleL {};
+std::atomic_flag atomicFlags{};
+
+std::atomic<bool> atomicBool{false};
+
+// inline ?
+
+
+simpleTestAudio audioLos;
+
+void prepareWork() {
+    simpleL.insert(simpleL.end(), {1 ,9, 0, 12});
+    logRun(" sender data Prepared ! \n");
+    audioLos = simpleTestAudio();
+    atomicBool.store(true);
+    atomicBool.notify_one();
+    //atomicFlags.test_and_set();
+    //atomicFlags.notify_one(); // notify_one/all =))
+
+}
+
+void completeWork() {
+
+    logRun(" Waiter : waiting for data ! \n");
+   // atomicFlags.wait(false);
+    atomicBool.wait(false);
+   simpleL[3] = 88;
+    logRun(" Waiter: complete work \n");
+    audioLos.callThread();
+
+    //for( const auto i : simpleL ) logRun(" my vector data :: %d \n", i);
+
+}
+
+
+constexpr int f(int x){
+     try { return x + 1;}
+     catch (...) { return 0; }
+}
 
 void LosMainVulkan::initializeMyVulkan() {
 
@@ -711,7 +778,82 @@ void LosMainVulkan::initializeMyVulkan() {
            logRun(" my vector values !! \n");
        };
 
-        
+     // audioLos = simpleTestAudio();
+
+
+
+       // std::experimental::pmr::vector<float> x(N, &mem);
+       //auto myresources = std::experimental::pmr::get_default_resource();
+
+      // std::experimental::pmr::
+
+      
+
+
+         if constexpr( std::endian::native == std::endian::big)
+             logRun(" los Big ! \n");
+         else if constexpr (std::endian::native == std::endian::little)
+             logRun(" los is small \n");
+         else logRun(" los unknown ! \n");
+          //myresources->allocate(1000);
+
+
+          // constexpr algorithm
+
+          // constexpr std::array<char, 6> aaa {'H', 'e', 'L', 'g', 'e', 'f'} ;
+          // constexpr auto it = std::find(aaa.begin(), aaa.end(), 'H'); // no =))
+
+
+          //  constexpr std::complex<double> c1{1.0, 0.0};
+
+
+
+
+
+
+
+        //logRun(" my resource size == %d ", myresources);
+
+        std::vector<int> vaK{1, 20, 53, 3, 8};
+        int sum = 0;
+       for (size_t i = 0; i < vaK.size(); i++){
+           if(vaK[i] < 10) [[likely]] sum -= sqrt(vaK[i]);
+           else sum += sqrt(vaK[i]);
+       }
+       // [[unlikely]]
+        logRun(" my final Sum == %d \n", sum);
+        //std::condition_variable
+        // completeWork
+
+         std::thread t1(prepareWork);
+         std::thread t2(completeWork);
+
+          t1.join();
+          t2.join();
+
+           constexpr int losNR = 43;
+           f(losNR); // ok =)) 
+
+
+
+     //  std::thread aThreadLos { SendOther(5) };
+     // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+     //   aThreadLos.join();
+
+
+
+
+
+
+
+
+
+
+
+
+
+      //  std::osyncstream
+
 
        constexpr double myDound =  powera(3.0f, 9);
         double easy = powera(3.0f, 5);
@@ -1292,11 +1434,11 @@ void LosMainVulkan::initializeMyVulkan() {
      swapCInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
      swapCInfo.surface = mSurfaceLos;
      swapCInfo.minImageCount = surfaceCapabilitiesKhrLos.minImageCount;
-     swapCInfo.imageFormat = vulkanA.mSurfaceLosFormat.format;
+     swapCInfo.imageFormat =  vulkanA.mSurfaceLosFormat.format;
      swapCInfo.imageColorSpace = vulkanA.mSurfaceLosFormat.colorSpace;
      swapCInfo.imageExtent.width = surfaceCapabilitiesKhrLos.currentExtent.width;
      swapCInfo.imageExtent.height = surfaceCapabilitiesKhrLos.currentExtent.height;
-     swapCInfo.imageUsage = surfaceCapabilitiesKhrLos.supportedUsageFlags;
+     swapCInfo.imageUsage = surfaceCapabilitiesKhrLos.supportedUsageFlags; // VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
      swapCInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
      swapCInfo.imageArrayLayers = 1;
      swapCInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -1311,7 +1453,7 @@ void LosMainVulkan::initializeMyVulkan() {
 
     logRun(" pre error 001 2  05005\n");
     res = check->vkCreateSwapchainKHR(vulkanA.mDeviceLos, &swapCInfo, nullptr, &vulkanA.swapChainMain);
-
+    //cb(res)
     logRun(" pre error 001 2 \n");
     cb(res);
 
@@ -1409,7 +1551,8 @@ void LosMainVulkan::initializeMyVulkan() {
         // vkGetImageMemoryRequirements()
 
          res = check->vkCreateImage(vulkanA.mDeviceLos, &imageCreateInfo, nullptr, &depthLosBuffer[i].image);
-
+         cb(res);
+         logRun(" depth error ! \n");
          vkGetImageMemoryRequirements1(vulkanA.mDeviceLos, depthLosBuffer[i].image, &mem_requirements);
 
          VkMemoryAllocateInfo  memoryAllocateIn = {};
@@ -1446,7 +1589,7 @@ void LosMainVulkan::initializeMyVulkan() {
     // image created
 
 
-     // initCommandBuffers( )
+     //TODO: initCommandBuffers( )
 
      VkCommandPoolCreateInfo  commandPoolCInfo = {};
      commandPoolCInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -1464,8 +1607,7 @@ void LosMainVulkan::initializeMyVulkan() {
       commandBufferAllocateInfo.commandBufferCount = 1;
 
 
-      // TODO: vkAllocateCommandBuffers
-
+      // vkAllocateCommandBuffers
 
       for(uint32_t i = 0; i < mSwapImCountL; i++ ){
 
@@ -1474,6 +1616,300 @@ void LosMainVulkan::initializeMyVulkan() {
 
       res = check->vkAllocateCommandBuffers(vulkanA.mDeviceLos, &commandBufferAllocateInfo, &setupBuffeCommands);
       cb(res);
+
+
+
+      // TODO: InitVertexBuffer
+
+      const float vb[3][7] = {
+              {-0.9f, -0.9f, 0.9f,     1.0f, 0.0f, 0.0f, 1.0f},
+              { 0.9f, -0.9f, 0.9f,     0.0f, 1.0f, 0.0f, 1.0f},
+              { 0.0f,  0.9f, 0.9f,     0.0f, 0.0f, 1.0f, 1.0f},
+      };
+
+        bool pas;
+        memset(&mVerticesL, 0, sizeof(mVerticesL));
+
+         VkBufferCreateInfo  bufferCreateInfo = {};
+         bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+         bufferCreateInfo.pNext = nullptr;
+         bufferCreateInfo.size = sizeof(vb);
+         bufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+         bufferCreateInfo.flags = 0;
+         res = check->vkCreateBuffer(vulkanA.mDeviceLos, &bufferCreateInfo, nullptr, &mVerticesL.buf);
+          cb(res);
+
+          VkMemoryRequirements  mme_res;
+          check->vkGetBufferMemoryRequirements(vulkanA.mDeviceLos, mVerticesL.buf, &mme_res);
+          cb(res);
+
+          VkMemoryAllocateInfo memoryAllocateInfo = {};
+          memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+          memoryAllocateInfo.pNext = nullptr;
+          memoryAllocateInfo.allocationSize = 0;
+          memoryAllocateInfo.memoryTypeIndex = 0;
+          memoryAllocateInfo.allocationSize = mme_res.size;
+
+          pas = getMemoryTypeFromProperties(mme_res.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &memoryAllocateInfo.memoryTypeIndex);
+
+          res = check->vkAllocateMemory(vulkanA.mDeviceLos, &memoryAllocateInfo, nullptr, &mVerticesL.mem);
+          void* data;
+          res = check->vkMapMemory(vulkanA.mDeviceLos, mVerticesL.mem, 0, memoryAllocateInfo.allocationSize, 0, &data);
+          cb(res);
+          memcpy(data, vb, sizeof(vb));
+          check->vkUnmapMemory(vulkanA.mDeviceLos, mVerticesL.mem);
+
+          res = check->vkBindBufferMemory(vulkanA.mDeviceLos, mVerticesL.buf, mVerticesL.mem, 0);
+          cb(res);
+
+          mVerticesL.vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+          mVerticesL.vi.pNext = nullptr;
+          mVerticesL.vi.vertexBindingDescriptionCount = 1;
+          mVerticesL.vi.pVertexBindingDescriptions = mVerticesL.vi_bindings;
+          mVerticesL.vi.vertexAttributeDescriptionCount = 2;
+          mVerticesL.vi.pVertexAttributeDescriptions = mVerticesL.vi_attrs;
+
+          mVerticesL.vi_bindings[0].binding = VERTEX_BUFFER_BIND_ID_LOS;
+          mVerticesL.vi_bindings[0].stride = sizeof(vb[0]);
+          mVerticesL.vi_bindings[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+          mVerticesL.vi_attrs[0].binding = VERTEX_BUFFER_BIND_ID_LOS;
+          mVerticesL.vi_attrs[0].location = 0;
+          mVerticesL.vi_attrs[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+          mVerticesL.vi_attrs[0].offset = 0;
+
+          mVerticesL.vi_attrs[1].binding = VERTEX_BUFFER_BIND_ID_LOS;
+          mVerticesL.vi_attrs[1].location = 1;
+          mVerticesL.vi_attrs[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+          mVerticesL.vi_attrs[1].offset = sizeof(float) * 3;
+
+        // TODO InitLayout
+
+        VkDescriptorSetLayoutCreateInfo descripSetLayouINfo = {};
+        descripSetLayouINfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        descripSetLayouINfo.pNext = nullptr;
+        descripSetLayouINfo.bindingCount = 0;
+        descripSetLayouINfo.pBindings = nullptr;
+
+    PFN_vkVoidFunction getDepsLaysetDect = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkCreateDescriptorSetLayout");
+    if( !getDepsLaysetDect ) throw  "Failed to load vkCreateDescriptorSetLayout";
+
+    PFN_vkCreateDescriptorSetLayout vkCreateDescriptorSetLayout1 = reinterpret_cast<PFN_vkCreateDescriptorSetLayout>( getDepsLaysetDect );
+
+
+
+         res = vkCreateDescriptorSetLayout1(vulkanA.mDeviceLos, &descripSetLayouINfo, nullptr, &lDescriptor);
+         cb(res);
+         logRun(" we are in desriptro set layoyt after \n");
+
+
+
+    PFN_vkVoidFunction getPipLayoutK = check->vkGetInstanceProcAddr( vulkanA.mainInstance, "vkCreatePipelineLayout");
+    if( !getPipLayoutK ) throw  "Failed to load vkCreatePipelineLayout";
+
+    PFN_vkCreatePipelineLayout vkCreatePipelineLayout1 = reinterpret_cast<PFN_vkCreatePipelineLayout>( getPipLayoutK );
+
+
+
+          VkPipelineLayoutCreateInfo pipelinCreaLayoutInfo = {};
+          pipelinCreaLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+          pipelinCreaLayoutInfo.pNext = nullptr;
+          pipelinCreaLayoutInfo.setLayoutCount = 1;
+          pipelinCreaLayoutInfo.pSetLayouts = &lDescriptor;
+          res = vkCreatePipelineLayout1(vulkanA.mDeviceLos, &pipelinCreaLayoutInfo, nullptr, &lPipelineLos);
+          cb(res);
+
+
+         // TODO InitRenderPass
+
+          VkAttachmentDescription attachmentDescription[2] = {};
+          attachmentDescription[0].flags = 0;
+          attachmentDescription[0].format =  vulkanA.mSurfaceLosFormat.format;
+          attachmentDescription[0].samples = VK_SAMPLE_COUNT_1_BIT;
+          attachmentDescription[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+          attachmentDescription[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+          attachmentDescription[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+          attachmentDescription[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+          attachmentDescription[0].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+          attachmentDescription[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+
+    attachmentDescription[1].flags = 1;
+    attachmentDescription[1].format =  depthLosBuffer[0].format;
+    attachmentDescription[1].samples = VK_SAMPLE_COUNT_1_BIT;
+    attachmentDescription[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachmentDescription[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachmentDescription[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachmentDescription[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachmentDescription[1].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    attachmentDescription[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference  colorReference = {};
+    colorReference.attachment = 0;
+    colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference  depthReference = {};
+    depthReference.attachment = 1;
+    depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+
+     VkSubpassDescription subpassDescription = {};
+     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS; // copute other !!!
+     subpassDescription.flags = 0;
+     subpassDescription.inputAttachmentCount = 0;
+     subpassDescription.pInputAttachments = nullptr;
+     subpassDescription.colorAttachmentCount = 1;
+     subpassDescription.pColorAttachments = &colorReference;
+     subpassDescription.pResolveAttachments = nullptr;
+     subpassDescription.pDepthStencilAttachment = &depthReference;
+     subpassDescription.preserveAttachmentCount = 0;
+     subpassDescription.pPreserveAttachments = nullptr;
+
+
+       VkRenderPassCreateInfo renderPassCreDesrip = {};
+       renderPassCreDesrip.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+       renderPassCreDesrip.pNext =  nullptr;
+       renderPassCreDesrip.attachmentCount = 2;
+       renderPassCreDesrip.pAttachments = attachmentDescription;
+       renderPassCreDesrip.subpassCount = 1;
+       renderPassCreDesrip.pSubpasses = &subpassDescription;
+       renderPassCreDesrip.dependencyCount = 0;
+       renderPassCreDesrip.pDependencies = nullptr;
+
+        res = check->vkCreateRenderPass(vulkanA.mDeviceLos, &renderPassCreDesrip, nullptr, &losRenderPass);
+         cb(res);
+
+         // TODO InitPipeline
+
+         VkPipelineVertexInputStateCreateInfo  vi = {};
+         vi = mVerticesL.vi;
+
+
+         VkPipelineInputAssemblyStateCreateInfo  ia = {};
+         ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+         ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+         VkPipelineRasterizationStateCreateInfo  rasS = {};
+         rasS.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+         rasS.polygonMode = VK_POLYGON_MODE_FILL;
+         rasS.cullMode = VK_CULL_MODE_BACK_BIT;
+         rasS.frontFace = VK_FRONT_FACE_CLOCKWISE;
+         rasS.depthClampEnable = VK_FALSE;
+         rasS.rasterizerDiscardEnable = VK_FALSE;
+         rasS.depthBiasEnable = VK_FALSE;
+         rasS.lineWidth = 1.0f; // was 1.0f !!!
+
+         VkPipelineColorBlendAttachmentState  att_stat[1] = {};
+         att_stat[0].colorWriteMask = 0xf;
+         att_stat[0].blendEnable = VK_FALSE;
+
+        VkPipelineColorBlendStateCreateInfo cba = {};
+        cba.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        cba.attachmentCount = 1;
+        cba.pAttachments = &att_stat[0];
+
+        VkPipelineViewportStateCreateInfo vpa = {};
+        vpa.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        vpa.viewportCount = 1;
+        vpa.scissorCount = 1;
+
+         VkViewport viewport = {};
+         viewport.height = (float) LosHeight;
+         viewport.width = (float ) LosWidth;
+         viewport.minDepth = (float) 0.0f;
+         viewport.maxDepth = (float) 1.0f;
+         vpa.pViewports = &viewport;
+
+          VkRect2D sciccor = {};
+          sciccor.extent.width = LosWidth;
+          sciccor.extent.height = LosHeight;
+          sciccor.offset.x = 0;
+          sciccor.offset.y = 0;
+          vpa.pScissors = &sciccor;
+
+           VkPipelineDepthStencilStateCreateInfo  dssd = {};
+           dssd.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+           dssd.depthTestEnable = VK_TRUE;
+           dssd.depthWriteEnable = VK_TRUE;
+           dssd.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+           dssd.depthBoundsTestEnable = VK_FALSE;
+           dssd.back.failOp = VK_STENCIL_OP_KEEP;
+           dssd.back.passOp = VK_STENCIL_OP_KEEP;
+           dssd.back.compareOp = VK_COMPARE_OP_ALWAYS;
+           dssd.stencilTestEnable = VK_FALSE;
+           dssd.front = dssd.back;
+
+           VkPipelineMultisampleStateCreateInfo  mss = {};
+           mss.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+           mss.pSampleMask = nullptr;
+           mss.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+            VkPipelineShaderStageCreateInfo sahadeStage[2] = {};
+            sahadeStage[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            sahadeStage[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+            sahadeStage[0].module = createShaderLos( (const uint32_t*)&shader_exampLos[0], shaderexamSize );
+            sahadeStage[0].pName = "main";
+            sahadeStage[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            sahadeStage[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+            sahadeStage[1].module = createShaderLos( (const uint32_t*)&shader_exampGLos[0], shaderexamGeraSize );
+            sahadeStage[1].pName = "main";
+
+              VkPipelineCacheCreateInfo popielndCac = {};
+               popielndCac.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+               popielndCac.pNext = nullptr;
+               popielndCac.flags = 0;
+
+           VkPipelineCache pipCacheLos;
+           res = check->vkCreatePipelineCache(vulkanA.mDeviceLos, &popielndCac, nullptr, &pipCacheLos);
+           cb(res);
+
+           VkGraphicsPipelineCreateInfo pipleCreateInfo = {};
+           pipleCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+           pipleCreateInfo.layout = lPipelineLos;
+           pipleCreateInfo.pVertexInputState = &vi;
+           pipleCreateInfo.pInputAssemblyState = &ia;
+           pipleCreateInfo.pRasterizationState = &rasS;
+           pipleCreateInfo.pColorBlendState = &cba;
+           pipleCreateInfo.pMultisampleState = &mss;
+           pipleCreateInfo.pViewportState = &vpa;
+           pipleCreateInfo.pDepthStencilState = &dssd;
+           pipleCreateInfo.pStages = &sahadeStage[0];
+           pipleCreateInfo.renderPass = losRenderPass;
+           pipleCreateInfo.pDynamicState = nullptr;
+           pipleCreateInfo.stageCount = 2;
+
+
+           res = check->vkCreateGraphicsPipelines(vulkanA.mDeviceLos, pipCacheLos, 1, &pipleCreateInfo, nullptr, &mPipe );
+           cb(res);
+           logRun(" create pipeline graphics ! \n");
+
+            check->vkDestroyPipelineCache(vulkanA.mDeviceLos, pipCacheLos, nullptr);
+            check->vkDestroyShaderModule(vulkanA.mDeviceLos, sahadeStage[0].module, nullptr);
+            check->vkDestroyShaderModule(vulkanA.mDeviceLos, sahadeStage[1].module, nullptr);
+
+
+
+       // TODO InitFRAMEBuffers
+       VkImageView attacjments[2] = {};
+       VkFramebufferCreateInfo  framebufferCreateInfo = {};
+       framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+       framebufferCreateInfo.pNext = nullptr;
+       framebufferCreateInfo.renderPass = losRenderPass;
+       framebufferCreateInfo.attachmentCount = 2;
+       framebufferCreateInfo.pAttachments = attacjments; // ??
+       framebufferCreateInfo.width = LosWidth;
+       framebufferCreateInfo.height = LosHeight;
+       framebufferCreateInfo.layers = 1;
+
+    losFrameBuff = new VkFramebuffer [mSwapImCountL];
+       logRun("Pre error ! \n");
+     for ( uint32_t  i = 0; i < mSwapImCountL; i++){
+         attacjments[0] = mySwapBuffer[i].view;
+         attacjments[1] = depthLosBuffer[i].view;
+         res = check->vkCreateFramebuffer(vulkanA.mDeviceLos, &framebufferCreateInfo, nullptr, &losFrameBuff[i]);
+         cb(res);
+     }
+    logRun("Pre error end ??? ! \n");
 
 
        // TODO: Init Sync !!
@@ -1495,7 +1931,7 @@ void LosMainVulkan::initializeMyVulkan() {
       cb(res);
 
 
-       // initSwapchainLayout
+       // TODO: initSwapchainLayout
        for (uint32_t i = 0; i < mSwapImCountL; i++) {
 
             VkCommandBuffer &cmdBuffer = mySwapBuffer[i].cmdBuffer;
@@ -1522,9 +1958,11 @@ void LosMainVulkan::initializeMyVulkan() {
            cb(res);
 
            // SetImageLayoutLos
+           logRun(" pre error setImageL \n");
            SetImageLayoutLos( mySwapBuffer[i].image, cmdBuffer, VK_IMAGE_ASPECT_COLOR_BIT,  VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+           logRun(" pre error 7873 setImageL \n");
            SetImageLayoutLos( depthLosBuffer[i].image, cmdBuffer, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
-
+           logRun(" pre error setImageL 22 \n");
            res = check->vkEndCommandBuffer(cmdBuffer);
            cb(res);
 
@@ -1546,16 +1984,131 @@ void LosMainVulkan::initializeMyVulkan() {
            cb(res);
            res = check->vkResetFences(vulkanA.mDeviceLos, 1, &fenceLos);
            cb(res);
+           logRun(" pre quit ! \n");
        }
 
 
 
 
 
+       // TODO: build command buffer  (BuildCmdBuffer)
+
+        for(uint32_t i = 0; i < mSwapImCountL; i++){
+
+            VkCommandBuffer &cmdBuffer = mySwapBuffer[i].cmdBuffer;
+
+            res = check->vkResetCommandBuffer(cmdBuffer, 0);
+            cb(res);
+
+            VkCommandBufferInheritanceInfo  cmd_bun_indfs = {};
+            cmd_bun_indfs.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+            cmd_bun_indfs.pNext = nullptr;
+            cmd_bun_indfs.renderPass = VK_NULL_HANDLE;
+            cmd_bun_indfs.subpass = 0;
+            cmd_bun_indfs.framebuffer = VK_NULL_HANDLE;
+            cmd_bun_indfs.framebuffer = VK_NULL_HANDLE;
+            cmd_bun_indfs.occlusionQueryEnable = VK_FALSE;
+            cmd_bun_indfs.queryFlags = 0;
+            cmd_bun_indfs.pipelineStatistics = 0;
+
+            VkCommandBufferBeginInfo cmd_df_begin = {};
+            cmd_df_begin.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            cmd_df_begin.pNext = nullptr;
+            cmd_df_begin.flags = 0;
+            cmd_df_begin.pInheritanceInfo = &cmd_bun_indfs;
+
+            res = check->vkBeginCommandBuffer(cmdBuffer, &cmd_df_begin);
+
+            SetImageLayoutLos(mySwapBuffer[i].image,
+                              cmdBuffer,
+                              VK_IMAGE_ASPECT_COLOR_BIT,
+                              VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                              VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+            SetImageLayoutLos(depthLosBuffer[i].image,
+                              cmdBuffer,
+                              VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+                              VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                              VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+
+            VkClearValue cleacValue[2] = {};
+            cleacValue[0].color.float32[0] = 0.3f;
+            cleacValue[0].color.float32[1] = 0.2f;
+            cleacValue[0].color.float32[2] = 0.7f;
+            cleacValue[0].color.float32[3] = 1.0f;
+            cleacValue[1].depthStencil.depth = 1.0f;
+            cleacValue[1].depthStencil.stencil = 0;
+
+
+            VkRenderPassBeginInfo drBegin = {};
+            drBegin.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            drBegin.pNext = nullptr;
+            drBegin.renderPass = losRenderPass;
+            drBegin.framebuffer = losFrameBuff[i];
+            drBegin.renderArea.offset.x = 0;
+            drBegin.renderArea.offset.y = 0;
+            drBegin.renderArea.extent.width = LosWidth;
+            drBegin.renderArea.extent.height = LosHeight;
+            drBegin.clearValueCount = 2;
+            drBegin.pClearValues =  cleacValue;
+
+
+
+            VkDeviceSize offsets[1] = {0};
+            check->vkCmdBeginRenderPass(cmdBuffer, &drBegin, VK_SUBPASS_CONTENTS_INLINE);
+            check->vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mPipe);
+            check->vkCmdBindVertexBuffers(cmdBuffer, VERTEX_BUFFER_BIND_ID_LOS, 1, &mVerticesL.buf, offsets);
+            check->vkCmdDraw(cmdBuffer, 3, 1, 0, 0);
+            check->vkCmdEndRenderPass(cmdBuffer);
+
+            SetImageLayoutLos(mySwapBuffer[i].image, cmdBuffer, VK_IMAGE_ASPECT_COLOR_BIT,
+                              VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                              VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                              VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                              VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
+
+            SetImageLayoutLos(depthLosBuffer[i].image, cmdBuffer, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+                              VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                              VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                              VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                              VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
+
+             res = check->vkEndCommandBuffer(cmdBuffer);
+
+            cb(res);
+
+        }
 
 
 
 
+
+    initialize_isOk = false;
+
+}
+
+
+
+ VkShaderModule LosMainVulkan::createShaderLos(const uint32_t* code, uint32_t size){
+
+     VkShaderModule moduleBack;
+     VkResult res;
+
+      VkShaderModuleCreateInfo  moduleCreateInfo = {};
+     moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+     moduleCreateInfo.pNext = nullptr;
+     moduleCreateInfo.codeSize = size;
+     moduleCreateInfo.pCode = code;
+     moduleCreateInfo.flags = 0;
+
+      res = check->vkCreateShaderModule(vulkanA.mDeviceLos, &moduleCreateInfo, nullptr, &moduleBack);
+      cb(res);
+
+
+     return moduleBack;
 }
 
 
@@ -1642,60 +2195,72 @@ void LosMainVulkan::SetImageLayoutLos(VkImage image, VkCommandBuffer cmdBuffer, 
 
     if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
     {
+         logRun("1 \n ");
         imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     }
     if (oldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
     {
+        logRun("2 \n ");
         imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
     }
     if (oldLayout == VK_IMAGE_LAYOUT_PREINITIALIZED)
     {
+        logRun("3 \n ");
         imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
     }
     if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
     {
+        logRun("4 \n ");
         imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     }
     if (oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
     {
+        logRun("5 \n ");
         imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
     }
     if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
     {
+        logRun("6 \n ");
         imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
     }
 
     if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
     {
+        logRun("7 \n ");
         // Ensures reads can be made
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
     }
     if (newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
     {
+        logRun("8 \n ");
         // Ensures writes can be made
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     }
     if (newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
     {
+        logRun("9 \n ");
         // Ensure writes have completed
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     }
     if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
     {
+        logRun("10 \n ");
         // Ensure writes have completed
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
     }
     if (newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
     {
+        logRun("11 \n ");
         // Make sure any Copy or CPU writes to image are flushed
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
     }
     if (newLayout == VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
     {
+        logRun("12 \n ");
         imageMemoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
     }
 
-    check->vkCmdPipelineBarrier(cmdBuffer, scrMask /*VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT*/, dstMask /*VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT*/, 0, 0, NULL, 0, NULL, 1, &imageMemoryBarrier);
+     check->vkCmdPipelineBarrier(cmdBuffer, scrMask /*VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT*/, dstMask /*VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT*/, 0, 0, NULL, 0, NULL, 1, &imageMemoryBarrier);
 
 }
 
@@ -1738,10 +2303,70 @@ void LosMainVulkan::SetImageLayoutLos(VkImage image, VkCommandBuffer cmdBuffer, 
     }
 }
 
+
+void LosMainVulkan::PresentBBuffers(){
+
+     VkResult res;
+      VkPresentInfoKHR presenInfo = {};
+    presenInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presenInfo.swapchainCount = 1;
+    presenInfo.pSwapchains = &vulkanA.swapChainMain;
+    presenInfo.pImageIndices = &swapchainCurrentIndex;
+    presenInfo.waitSemaphoreCount = 1;
+    presenInfo.pWaitSemaphores = &renderCompleteSema;
+
+     res = check->vkQueuePresentKHR(vulkanA.mQueueLos, &presenInfo);
+     cb(res);
+
+    SetNextBuf();
+}
+
+void LosMainVulkan::SetNextBuf(){
+
+     VkResult res;
+
+     res = check->vkAcquireNextImageKhr(vulkanA.mDeviceLos, vulkanA.swapChainMain, UINT64_MAX, backBufferSema, VK_NULL_HANDLE, &swapchainCurrentIndex);
+   if ( res == VK_ERROR_OUT_OF_DATE_KHR){
+       logRun(" vk error out of handle in sample \n");
+   }else if (res == VK_SUBOPTIMAL_KHR){
+        logRun(" suboptimes not handle \n");
+   }
+   cb(res);
+}
+
 void LosMainVulkan::Render() noexcept{
 
 
     losGame->preRender();
+
+    if(!initialize_isOk){
+        return ;
+    } else {
+
+          VkFence nullFence = VK_NULL_HANDLE;
+          const VkPipelineStageFlags  WaitSdtFlasgs = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+          VkSubmitInfo subInfo = {};
+          subInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+          subInfo.pNext = nullptr;
+          subInfo.waitSemaphoreCount = 1;
+          subInfo.pWaitSemaphores = &backBufferSema;
+          subInfo.pWaitDstStageMask = &WaitSdtFlasgs;
+          subInfo.commandBufferCount = 1;
+          subInfo.pCommandBuffers = &mySwapBuffer[swapchainCurrentIndex].cmdBuffer;
+          subInfo.signalSemaphoreCount = 1;
+          subInfo.pSignalSemaphores = &renderCompleteSema;
+
+          VkResult  res;
+          res = check->vkQueueSubmit(vulkanA.mQueueLos, 1, &subInfo, VK_NULL_HANDLE);
+          cb(res);
+
+          PresentBBuffers();
+           // get Fps
+    }
+
+
+
 
 }
 LosMainVulkan::~LosMainVulkan() {

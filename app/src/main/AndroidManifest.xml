@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-        <activity android:name=".MainActivity"
+        <activity android:name=".RenderActiv"
             android:exported="true">
             <meta-data android:name="android.app.lib_name"
                        android:value="renderingsLos"/>

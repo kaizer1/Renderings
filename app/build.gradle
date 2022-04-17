@@ -21,7 +21,8 @@ android {
                 // ok module -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7856742\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\c++\v1\module.modulemap
                 // -fmodules -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7956693\sources\cxx-stl\llvm-libc++\include\module.modulemap
                 // -fmodule-map-file=Q:\AndroidProject\Renderings\app\src\main\cpp\losmod.modulemap - ok too ( but error also )
-                cppFlags "-std=c++20 -fmodules" // -Ofast  -fsanitize=memory
+                cppFlags "-std=c++20 -Ofast -O3 -ftree-vectorize" // -Ofast  -fsanitize=memory
+              // -fmodules -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.8215888\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\c++\v1\module.modulemap -fmodules-decluse -fno-implicit-modules
                // -fmodules -fmodule-map-file=Q:\AndroidSDK\ndk\24.0.7856742\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\include\c++\v1\module.modulemap
            // -fmodules -fmodule-map-file=Q:\AndroidProject\Renderings\app\src\main\cpp\losmod.modulemap
                 // -Ofast -O3 -ftree-vectorize
@@ -29,7 +30,7 @@ android {
         }
 
         ndk { abiFilters 'arm64-v8a' }
-        ndkVersion '24.0.7856742'  // was 23.1.7779620
+        ndkVersion '24.0.8215888'  // was 23.1.7779620  24.0.7856742
     }
 
 
@@ -91,7 +92,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    ndkVersion '24.0.7856742'
+    ndkVersion '24.0.8215888'
 }
 
 dependencies {

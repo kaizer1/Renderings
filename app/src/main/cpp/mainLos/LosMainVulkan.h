@@ -242,8 +242,6 @@ public:
 
 
 
-
-
     }
 
     void activateAndroid(){

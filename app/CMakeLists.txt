@@ -79,6 +79,7 @@ target_link_libraries(renderingsLos
                       -fopenmp
                       -static-openmp
                        aaudio # olny api 26 added
+                      -pthread # ok added this
                       ${log-lib} )
 
 # add sanitize for android

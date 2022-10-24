@@ -93,6 +93,7 @@ android {
         jvmTarget = '1.8'
     }
     ndkVersion '24.0.8215888'
+    namespace 'com.sergey.los.freelanceideas.renderings'
 }
 
 dependencies {

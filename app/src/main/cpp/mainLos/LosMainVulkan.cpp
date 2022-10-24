@@ -1222,8 +1222,7 @@ void LosMainVulkan::initializeMyVulkan() {
 
     VkBool32 swapchainExtFound = 0;
     VkExtensionProperties *deveExten1 = new VkExtensionProperties[deviceExten];
-    res = vkEnumerateDeviceExtensionProperties1(myPhysicalDevice, nullptr, &deviceExten,
-                                                deveExten1);
+    res = vkEnumerateDeviceExtensionProperties1(myPhysicalDevice, nullptr, &deviceExten,deveExten1);
     cb(res);
 
     // uint32_t enabledExtensionCount = 0;

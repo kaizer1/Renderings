@@ -19,9 +19,8 @@ class RenderActiv : NativeActivity() {
 
 
         hideSystemUI()
-        if (Build.VERSION.SDK_INT >= 28) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES }
+        window.attributes.layoutInDisplayCutoutMode =
+            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
     }
 
@@ -32,7 +31,6 @@ class RenderActiv : NativeActivity() {
 //    external fun stringFromJNI(): String
 
 
-    @TargetApi(19)
     override fun onResume() {
         super.onResume()
         hideSystemUI()

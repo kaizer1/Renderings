@@ -10,7 +10,7 @@ project("renderings")
 MESSAGE(WARNING "sdf: " ${ANDROID_PLATFORM})
 set(gluLos ../../GlueLos)
 
-set(cpuFeatures ../../../AndroidSDK/ndk/24.0.7856742/sources/android/cpufeatures)
+set(cpuFeatures ../../../AndroidSDK/ndk/25.0.8775105/sources/android/cpufeatures)
 
 if(${ANDROID_PLATFORM} MATCHES "android-24" )
   MESSAGE(WARNING " minAPI 24 ok ")
@@ -38,6 +38,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_o
 add_library( renderingsLos  SHARED
 
         src/main/cpp/renderingStart.cpp
+       #
        # src/main/cpp/moduletest/LosModule.cpp
 #        src/main/cpp/mainLos/LosMainVulkan.cpp
 #        src/main/cpp/mainLos/assetsLos.c

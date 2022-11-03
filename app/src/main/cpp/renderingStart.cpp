@@ -24,9 +24,9 @@
 #include "logLos.h"
 #include <string_view>
 
-#include <atomic>;
-#include <thread>;
-#include <vector>;
+#include <atomic>
+#include <thread>
+#include <vector>
 //import string;
 //import locale_h;
 //import __locale;

@@ -1,0 +1,20 @@
+// Loskutnikov Games testing 
+
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+cc_test {
+    name: "MyFirstTest",
+    srcs: ["renderingStart_test.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        
+    ],
+    test_suites: ["general-tests"],
+    host_supported: true,
+    test_options: {
+        unit_test: false,
+    },
+}

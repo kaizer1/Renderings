@@ -104,6 +104,7 @@ void android_main(struct android_app* state)
     //logRun(" my values ! %s", toString(Color::green)); // ok test
 
 
+    logRun(" building  1 ");
      Point3D los3D{3, 6, 10};
     logRun(" my values ! %d, %d, %d", los3D.x, los3D.y, los3D.z);
 

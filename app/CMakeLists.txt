@@ -40,11 +40,11 @@ add_library( renderingsLos  SHARED
         src/main/cpp/renderingStart.cpp
        #
        # src/main/cpp/moduletest/LosModule.cpp
-#        src/main/cpp/mainLos/LosMainVulkan.cpp
-#        src/main/cpp/mainLos/assetsLos.c
-#        src/main/cpp/gameRender.cpp
+        src/main/cpp/mainLos/LosMainVulkan.cpp
+        src/main/cpp/mainLos/assetsLos.c
+        src/main/cpp/gameRender.cpp
         # src/main/cpp/foo.ixx
-#        src/main/cpp/AudioEngines/AudioMain.cpp
+        src/main/cpp/AudioEngines/AudioMain.cpp
         )
 
 

@@ -4,8 +4,29 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     //buildToolsVersion "31.0.0 rc1"
+
+//    execution {
+//        profiles {
+//            high {
+//                r8 {
+//                    jvmOptions += ["-Xms2048m", "-Xmx8192m", "-XX:+HeapDumpOnOutOfMemoryError"]
+//                    runInSeparateProcess true
+//                }
+//            }
+//            low {
+//                r8 {
+//                    jvmOptions += ["-Xms256m", "-Xmx2048m", "-XX:+HeapDumpOnOutOfMemoryError"]
+//                    runInSeparateProcess true
+//                }
+//            }
+//            ci {
+//                r8.runInSeparateProcess false
+//            }
+//        }
+//        defaultProfile "high"
+//    }
 
     defaultConfig {
         applicationId "com.sergey.los.freelanceideas.renderings"
@@ -39,7 +60,7 @@ android {
     }
 
 
-    flavorDimensions "api"
+    flavorDimensions.add("api")
 
     productFlavors {
         minApi30 {
@@ -102,8 +123,6 @@ android {
 }
 
 dependencies {
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.9.0'
-
 }

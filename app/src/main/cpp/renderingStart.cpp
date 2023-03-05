@@ -1,7 +1,7 @@
 // TODO Loskutnikov Games .inc
 
-//#include "mainLos/LosMainVulkan.h"
-//#include "mainLos/assetsLos.h"
+#include "mainLos/LosMainVulkan.h"
+#include "mainLos/assetsLos.h"
 
 //import androidndk;
 
@@ -72,24 +72,24 @@ std::string_view toString(Color cdf){
 
 
 
-std::vector<int> myvec{};
-std::atomic<bool> atomicBool{false};
-
-void prepareWork() {
-    myvec.insert(myvec.end(), {0, 1, 0, 3});
-    logRun(" data prepare ! ");
-    atomicBool.store(true);
-    atomicBool.notify_one();
-}
-
-void completeWork() {
-
-    logRun(" Waiting for data   ! ");
-    atomicBool.wait(false);
-    myvec[2] = 2;
-    logRun(" Waiting complete  ");
-    for (auto i : myvec) logRun(" %d ", myvec[i]);
-}
+//std::vector<int> myvec{};
+//std::atomic<bool> atomicBool{false};
+//
+//void prepareWork() {
+//    myvec.insert(myvec.end(), {0, 1, 0, 3});
+//    logRun(" data prepare ! ");
+//    atomicBool.store(true);
+//    atomicBool.notify_one();
+//}
+//
+//void completeWork() {
+//
+//    logRun(" Waiting for data   ! ");
+//    atomicBool.wait(false);
+//    myvec[2] = 2;
+//    logRun(" Waiting complete  ");
+//    for (auto i : myvec) logRun(" %d ", myvec[i]);
+//}
 
 
 void android_main(struct android_app* state)
@@ -101,25 +101,28 @@ void android_main(struct android_app* state)
 
      using enum Color;
 
-    logRun(" my values ! %s", toString(Color::green));
+    //logRun(" my values ! %s", toString(Color::green)); // ok test
 
 
      Point3D los3D{3, 6, 10};
     logRun(" my values ! %d, %d, %d", los3D.x, los3D.y, los3D.z);
 
+    logRun("simple start ");
 
-    std::thread t1(prepareWork);
-    std::thread t2(completeWork);
+    //std::thread t1(prepareWork);
+    //std::thread t2(completeWork);
 
-    t1.join();
-    t2.join();
+   // t1.join();
+   // t2.join();
 
 
 
-//    LosAssetLoaderInit((void *) state->activity->assetManager);
-//    mainAp = state;
-//    auto  run = std::make_unique<LosMainVulkan>();
-//    run->looperMainVulkan();
-//    run->~LosMainVulkan();
+    LosAssetLoaderInit((void *) state->activity->assetManager);
+   // mainAp = state;
+    logRun("86 " );
+    auto run = std::make_unique<LosMainVulkan>();
+    logRun("Pre loop " );
+    run->looperMainVulkan();
+    run->~LosMainVulkan();
 
 }

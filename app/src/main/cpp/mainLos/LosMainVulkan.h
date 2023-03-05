@@ -320,7 +320,7 @@ struct saved_state
 class LosMainVulkan {
 
 public:
-      LosMainVulkan();
+      explicit LosMainVulkan();
       ~LosMainVulkan();
 
       static void LosApplicationCMD(struct android_app* app, int32_t cmd);

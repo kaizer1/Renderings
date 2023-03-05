@@ -7,7 +7,7 @@
 //import thread;
 
 
-#include <cassert>
+#include <assert>
 #include "LosMainVulkan.h"
 #include "logLos.h"
 
@@ -390,8 +390,11 @@ VKAPI_ATTR VkBool32 VKAPI_CALL genericDebugCallback(
 
 LosMainVulkan::LosMainVulkan() {
 
+    logRun(" start losMain 01 ");
     mainAp->userData = this;
+    logRun(" start losMain 02 ");
     mainAp->onAppCmd = LosApplicationCMD;
+    logRun(" start losMain 03 ");
     mainAp->onInputEvent = losInputWorkingHandle;
 
 
@@ -2192,6 +2195,7 @@ void LosMainVulkan::SetImageLayoutLos(VkImage image, VkCommandBuffer cmdBuffer, 
     imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 
 
+    logRun(" this pre error ! ");
     if (oldLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
     {
          logRun("1 \n ");

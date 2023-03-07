@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    //id 'com.android.settings'
 }
 
 android {
@@ -30,10 +31,13 @@ android {
 
     defaultConfig {
         applicationId "com.sergey.los.freelanceideas.renderings"
-        minSdkVersion 24
-        targetSdkVersion 33
+        //minSdkVersion 24
+        minSdk 24
+        targetSdk 33
+        //targetSdkVersion 33
         versionCode 1
         versionName "1.0"
+
 
       //  testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
@@ -120,6 +124,29 @@ android {
     }
     ndkVersion '25.0.8775105'
     namespace 'com.sergey.los.freelanceideas.renderings'
+
+
+//     execution {
+//          profiles {
+//               high {
+//                   r8 {
+//                        jvmOptions += ["-Xms2048m", "-Xmx8192m", "-XX:+HeapDumpOnOutOfMemoryError"]
+//                        runInSeparateProcess true
+//                   }
+//               }
+//              low {
+//                  r8 {
+//                      jvmOptions += ["-Xms256m", "-Xmx2048m", "-XX:+HeapDumpOnOutOfMemoryError"]
+//                      runInSeparateProcess true
+//                  }
+//              }
+//              ci {
+//                  r8.runInSeparateProcess false
+//              }
+//          }
+//         defaultProfile "high"
+//     }
+
 }
 
 dependencies {

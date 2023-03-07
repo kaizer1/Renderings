@@ -49,7 +49,8 @@
 enum class Color {
      red,
      green,
-     blue
+     blue,
+     purple
 };
 
 class Point3D {
@@ -66,6 +67,8 @@ std::string_view toString(Color cdf){
         case red: return "lodRed";
         case green: [[likely]] return "losGreen";
         case blue:  return "losBlue";
+        case purple: return "Purple";
+
     }
     return "unknown";
 }

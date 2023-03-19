@@ -102,6 +102,8 @@ void android_main(struct android_app* state)
 
     logRun(" my values ! %d", 3000);
 
+    // new render is
+
      using enum Color;
 
     //logRun(" my values ! %s", toString(Color::green)); // ok test

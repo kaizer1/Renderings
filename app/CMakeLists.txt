@@ -12,14 +12,17 @@ set(gluLos ../../GlueLos)
 
 set(cpuFeatures ../../../AndroidSDK/ndk/25.0.8775105/sources/android/cpufeatures)
 
-if(${ANDROID_PLATFORM} MATCHES "android-24" )
-  MESSAGE(WARNING " minAPI 24 ok ")
-  set(exists30 false)
+if(${ANDROID_PLATFORM} MATCHES "android-29" )
+  MESSAGE(WARNING " minAPI 29 ok ")  #  was 24
+  set(exists33 false)
 else()
-  MESSAGE(WARNING " minAPi 30 ok  ")
-  set(exists30 true)
+  MESSAGE(WARNING " minAPi 33 ok  ")
+  set(exists33 true)
 endif()
 
+
+
+add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR=1)
 
 #add_library(glueLos STATIC ${gluLos}/los_android_native_app_glue.c)
 
@@ -62,8 +65,9 @@ target_include_directories(renderingsLos PRIVATE
         )
 
 
-if(${exists30})
-  set(BinaryLibraryAdd EGL GLESv3)
+if(${exists33})
+  #set(BinaryLibraryAdd EGL GLESv3)
+   set(BinaryLibraryAdd vulkan)
 else()
   set(BinaryLibraryAdd vulkan)
 endif()

@@ -55,7 +55,7 @@ using namespace std;*/
 
 
 
-#if(__ANDROID_API__ >= 30)
+#if(__ANDROID_API__ >= 29)
 #include <android/thermal.h>
 #include <vulkan/vulkan_android.h>
 
@@ -106,134 +106,227 @@ struct Vertices
 };
 
 
+#include <logLos.h>
+
+
+//PFN_vkEnumerateInstanceVersion vkEnumerateInstanceVersion;
+
 struct CheckVulkan {
 
     // checking Vulkan
 public:
 
+
+
+    void aa(){
+
+    }
+
     CheckVulkan() {
+        logRun(" not loading 01 ");
         losLibrary = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
+
         if (!losLibrary)
+        {
+           logRun(" not loading ");
+
             losLibrary = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
+        }else{
+            logRun(" ok loading !! !");
+
+   // PFN_vkEnumerateInstanceVersion vkEnumerateInstanceVersion = LOAD_HARD(vkEnumerateInstanceVersion);
+   // PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties =
+     //       LOAD_HARD(vkEnumerateInstanceExtensionProperties);
+
+
+            initializedAll();
+    //    PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties = LOAD_HARD(vkEnumerateInstanceLayerProperties);
+//    PFN_vkCreateInstance vkCreateInstance = LOAD_HARD(vkCreateInstance);
+//    PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = LOAD_HARD(vkGetInstanceProcAddr);
+//    PFN_vkDestroyInstance vkDestroyInstance = LOAD_HARD(vkDestroyInstance);
+//    //PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = LOAD_HARD(vkCreateDebugReportCallbackEXT);
+//    PFN_vkDebugReportCallbackEXT vkDebugReportCallbackEXT = LOAD_HARD(vkDebugReportCallbackEXT);
+//    //PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHRNew = LOAD_HARD(vkCreateAndroidSurfaceKHRNew);
+//    PFN_vkDestroyDevice vkDestroyDevice = LOAD_HARD(vkDestroyDevice);
+//    PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR = LOAD_HARD(vkDestroySurfaceKHR);
+//    PFN_vkDestroySwapchainKHR vkDestroySwapchainKHR = LOAD_HARD(vkDestroySwapchainKHR);
+//    PFN_vkCreateDevice vkCreateDevice = LOAD_HARD(vkCreateDevice);
+//    PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR = LOAD_HARD(vkCreateSwapchainKHR);
+//    PFN_vkCreateImageView vkCreateImageView = LOAD_HARD(vkCreateImageView);
+//    PFN_vkCreateImage vkCreateImage = LOAD_HARD(vkCreateImage);
+//    PFN_vkAllocateMemory vkAllocateMemory = LOAD_HARD(vkAllocateMemory);
+//    PFN_vkBindImageMemory vkBindImageMemory = LOAD_HARD(vkBindImageMemory);
+//    PFN_vkCreateCommandPool vkCreateCommandPool = LOAD_HARD(vkCreateCommandPool);
+//    PFN_vkAllocateCommandBuffers vkAllocateCommandBuffers = LOAD_HARD(vkAllocateCommandBuffers);
+//    PFN_vkCreateSemaphore vkCreateSemaphore = LOAD_HARD(vkCreateSemaphore);
+//    PFN_vkCreateFence vkCreateFence = LOAD_HARD(vkCreateFence);
+//    PFN_vkResetCommandBuffer vkResetCommandBuffer = LOAD_HARD(vkResetCommandBuffer);
+//    PFN_vkBeginCommandBuffer vkBeginCommandBuffer = LOAD_HARD(vkBeginCommandBuffer);
+//    PFN_vkEndCommandBuffer vkEndCommandBuffer = LOAD_HARD(vkEndCommandBuffer);
+//    PFN_vkQueueSubmit vkQueueSubmit = LOAD_HARD(vkQueueSubmit);
+//    PFN_vkResetFences vkResetFences = LOAD_HARD(vkResetFences);
+//    PFN_vkWaitForFences vkWaitForFences = LOAD_HARD(vkWaitForFences);
+//    PFN_vkCmdPipelineBarrier vkCmdPipelineBarrier = LOAD_HARD(vkCmdPipelineBarrier);
+//    PFN_vkFreeCommandBuffers vkFreeCommandBuffers = LOAD_HARD(vkFreeCommandBuffers);
+//    PFN_vkDestroyImageView vkDestroyImageView = LOAD_HARD(vkDestroyImageView);
+//    PFN_vkDestroyImage vkDestroyImage = LOAD_HARD(vkDestroyImage);
+//    PFN_vkFreeMemory vkFreeMemory = LOAD_HARD(vkFreeMemory);
+//    PFN_vkDestroyCommandPool vkDestroyCommandPool = LOAD_HARD(vkDestroyCommandPool);
+//    PFN_vkDestroySemaphore vkDestroySemaphore = LOAD_HARD(vkDestroySemaphore);
+//    PFN_vkDestroyFence vkDestroyFence = LOAD_HARD(vkDestroyFence);
+//    PFN_vkCreateRenderPass vkCreateRenderPass = LOAD_HARD(vkCreateRenderPass);
+//    PFN_vkCreateShaderModule vkCreateShaderModule = LOAD_HARD(vkCreateShaderModule);
+//    PFN_vkCreateGraphicsPipelines vkCreateGraphicsPipelines = LOAD_HARD(vkCreateGraphicsPipelines);
+//    PFN_vkCreatePipelineCache vkCreatePipelineCache = LOAD_HARD(vkCreatePipelineCache);
+//    PFN_vkDestroyPipelineCache vkDestroyPipelineCache = LOAD_HARD(vkDestroyPipelineCache);
+//    PFN_vkDestroyShaderModule vkDestroyShaderModule = LOAD_HARD(vkDestroyShaderModule);
+//    PFN_vkCreateBuffer vkCreateBuffer = LOAD_HARD(vkCreateBuffer);
+//    PFN_vkGetBufferMemoryRequirements vkGetBufferMemoryRequirements = LOAD_HARD(vkGetBufferMemoryRequirements);
+//    PFN_vkQueuePresentKHR vkQueuePresentKHR = LOAD_HARD(vkQueuePresentKHR);
+//    PFN_vkAcquireNextImageKHR vkAcquireNextImageKhr = LOAD_HARD(vkAcquireNextImageKhr);
+//    PFN_vkCmdBeginRenderPass vkCmdBeginRenderPass = LOAD_HARD(vkCmdBeginRenderPass);
+//    PFN_vkCmdBindPipeline vkCmdBindPipeline = LOAD_HARD(vkCmdBindPipeline);
+//    PFN_vkCmdEndRenderPass vkCmdEndRenderPass = LOAD_HARD(vkCmdEndRenderPass);
+//    PFN_vkCmdDraw vkCmdDraw = LOAD_HARD(vkCmdDraw);
+//    PFN_vkCmdBindVertexBuffers vkCmdBindVertexBuffers = LOAD_HARD(vkCmdBindVertexBuffers);
+//    PFN_vkMapMemory vkMapMemory = LOAD_HARD(vkMapMemory);
+//    PFN_vkUnmapMemory vkUnmapMemory = LOAD_HARD(vkUnmapMemory);
+//    PFN_vkBindBufferMemory vkBindBufferMemory = LOAD_HARD(vkBindBufferMemory);
+//    PFN_vkCreateFramebuffer vkCreateFramebuffer = LOAD_HARD(vkCreateFramebuffer);
+
+        }
+
+
     }
 
     PFN_vkEnumerateInstanceVersion vkEnumerateInstanceVersion = LOAD_HARD(vkEnumerateInstanceVersion);
-    PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties =
-            LOAD_HARD(vkEnumerateInstanceExtensionProperties);
-    PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties = LOAD_HARD(vkEnumerateInstanceLayerProperties);
-    PFN_vkCreateInstance vkCreateInstance = LOAD_HARD(vkCreateInstance);
-    PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = LOAD_HARD(vkGetInstanceProcAddr);
-    PFN_vkDestroyInstance vkDestroyInstance = LOAD_HARD(vkDestroyInstance);
-    //PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = LOAD_HARD(vkCreateDebugReportCallbackEXT);
-    PFN_vkDebugReportCallbackEXT vkDebugReportCallbackEXT = LOAD_HARD(vkDebugReportCallbackEXT);
-    //PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHRNew = LOAD_HARD(vkCreateAndroidSurfaceKHRNew);
-    PFN_vkDestroyDevice vkDestroyDevice = LOAD_HARD(vkDestroyDevice);
-    PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR = LOAD_HARD(vkDestroySurfaceKHR);
-    PFN_vkDestroySwapchainKHR vkDestroySwapchainKHR = LOAD_HARD(vkDestroySwapchainKHR);
-    PFN_vkCreateDevice vkCreateDevice = LOAD_HARD(vkCreateDevice);
-    PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR = LOAD_HARD(vkCreateSwapchainKHR);
-    PFN_vkCreateImageView vkCreateImageView = LOAD_HARD(vkCreateImageView);
-    PFN_vkCreateImage vkCreateImage = LOAD_HARD(vkCreateImage);
-    PFN_vkAllocateMemory vkAllocateMemory = LOAD_HARD(vkAllocateMemory);
-    PFN_vkBindImageMemory vkBindImageMemory = LOAD_HARD(vkBindImageMemory);
-    PFN_vkCreateCommandPool vkCreateCommandPool = LOAD_HARD(vkCreateCommandPool);
-    PFN_vkAllocateCommandBuffers vkAllocateCommandBuffers = LOAD_HARD(vkAllocateCommandBuffers);
-    PFN_vkCreateSemaphore vkCreateSemaphore = LOAD_HARD(vkCreateSemaphore);
-    PFN_vkCreateFence vkCreateFence = LOAD_HARD(vkCreateFence);
-    PFN_vkResetCommandBuffer vkResetCommandBuffer = LOAD_HARD(vkResetCommandBuffer);
-    PFN_vkBeginCommandBuffer vkBeginCommandBuffer = LOAD_HARD(vkBeginCommandBuffer);
-    PFN_vkEndCommandBuffer vkEndCommandBuffer = LOAD_HARD(vkEndCommandBuffer);
-    PFN_vkQueueSubmit vkQueueSubmit = LOAD_HARD(vkQueueSubmit);
-    PFN_vkResetFences vkResetFences = LOAD_HARD(vkResetFences);
-    PFN_vkWaitForFences vkWaitForFences = LOAD_HARD(vkWaitForFences);
-    PFN_vkCmdPipelineBarrier vkCmdPipelineBarrier = LOAD_HARD(vkCmdPipelineBarrier);
-    PFN_vkFreeCommandBuffers vkFreeCommandBuffers = LOAD_HARD(vkFreeCommandBuffers);
-    PFN_vkDestroyImageView vkDestroyImageView = LOAD_HARD(vkDestroyImageView);
-    PFN_vkDestroyImage vkDestroyImage = LOAD_HARD(vkDestroyImage);
-    PFN_vkFreeMemory vkFreeMemory = LOAD_HARD(vkFreeMemory);
-    PFN_vkDestroyCommandPool vkDestroyCommandPool = LOAD_HARD(vkDestroyCommandPool);
-    PFN_vkDestroySemaphore vkDestroySemaphore = LOAD_HARD(vkDestroySemaphore);
-    PFN_vkDestroyFence vkDestroyFence = LOAD_HARD(vkDestroyFence);
-    PFN_vkCreateRenderPass vkCreateRenderPass = LOAD_HARD(vkCreateRenderPass);
-    PFN_vkCreateShaderModule vkCreateShaderModule = LOAD_HARD(vkCreateShaderModule);
-    PFN_vkCreateGraphicsPipelines vkCreateGraphicsPipelines = LOAD_HARD(vkCreateGraphicsPipelines);
-    PFN_vkCreatePipelineCache vkCreatePipelineCache = LOAD_HARD(vkCreatePipelineCache);
-    PFN_vkDestroyPipelineCache vkDestroyPipelineCache = LOAD_HARD(vkDestroyPipelineCache);
-    PFN_vkDestroyShaderModule vkDestroyShaderModule = LOAD_HARD(vkDestroyShaderModule);
-    PFN_vkCreateBuffer vkCreateBuffer = LOAD_HARD(vkCreateBuffer);
-    PFN_vkGetBufferMemoryRequirements vkGetBufferMemoryRequirements = LOAD_HARD(vkGetBufferMemoryRequirements);
-    PFN_vkQueuePresentKHR vkQueuePresentKHR = LOAD_HARD(vkQueuePresentKHR);
-    PFN_vkAcquireNextImageKHR vkAcquireNextImageKhr = LOAD_HARD(vkAcquireNextImageKhr);
-    PFN_vkCmdBeginRenderPass vkCmdBeginRenderPass = LOAD_HARD(vkCmdBeginRenderPass);
-    PFN_vkCmdBindPipeline vkCmdBindPipeline = LOAD_HARD(vkCmdBindPipeline);
-    PFN_vkCmdEndRenderPass vkCmdEndRenderPass = LOAD_HARD(vkCmdEndRenderPass);
-    PFN_vkCmdDraw vkCmdDraw = LOAD_HARD(vkCmdDraw);
-    PFN_vkCmdBindVertexBuffers vkCmdBindVertexBuffers = LOAD_HARD(vkCmdBindVertexBuffers);
-    PFN_vkMapMemory vkMapMemory = LOAD_HARD(vkMapMemory);
-    PFN_vkUnmapMemory vkUnmapMemory = LOAD_HARD(vkUnmapMemory);
-    PFN_vkBindBufferMemory vkBindBufferMemory = LOAD_HARD(vkBindBufferMemory);
-    PFN_vkCreateFramebuffer vkCreateFramebuffer = LOAD_HARD(vkCreateFramebuffer);
+    PFN_vkEnumerateInstanceExtensionProperties vkEnumerateInstanceExtensionProperties = LOAD_HARD(vkEnumerateInstanceExtensionProperties);
+//    PFN_vkEnumerateInstanceLayerProperties vkEnumerateInstanceLayerProperties = LOAD_HARD(vkEnumerateInstanceLayerProperties);
+//    PFN_vkCreateInstance vkCreateInstance = LOAD_HARD(vkCreateInstance);
+//    PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = LOAD_HARD(vkGetInstanceProcAddr);
+//    PFN_vkDestroyInstance vkDestroyInstance = LOAD_HARD(vkDestroyInstance);
+//    //PFN_vkCreateDebugReportCallbackEXT vkCreateDebugReportCallbackEXT = LOAD_HARD(vkCreateDebugReportCallbackEXT);
+//    PFN_vkDebugReportCallbackEXT vkDebugReportCallbackEXT = LOAD_HARD(vkDebugReportCallbackEXT);
+//    //PFN_vkCreateAndroidSurfaceKHR vkCreateAndroidSurfaceKHRNew = LOAD_HARD(vkCreateAndroidSurfaceKHRNew);
+//    PFN_vkDestroyDevice vkDestroyDevice = LOAD_HARD(vkDestroyDevice);
+//    PFN_vkDestroySurfaceKHR vkDestroySurfaceKHR = LOAD_HARD(vkDestroySurfaceKHR);
+//    PFN_vkDestroySwapchainKHR vkDestroySwapchainKHR = LOAD_HARD(vkDestroySwapchainKHR);
+//    PFN_vkCreateDevice vkCreateDevice = LOAD_HARD(vkCreateDevice);
+//    PFN_vkCreateSwapchainKHR vkCreateSwapchainKHR = LOAD_HARD(vkCreateSwapchainKHR);
+//    PFN_vkCreateImageView vkCreateImageView = LOAD_HARD(vkCreateImageView);
+//    PFN_vkCreateImage vkCreateImage = LOAD_HARD(vkCreateImage);
+//    PFN_vkAllocateMemory vkAllocateMemory = LOAD_HARD(vkAllocateMemory);
+//    PFN_vkBindImageMemory vkBindImageMemory = LOAD_HARD(vkBindImageMemory);
+//    PFN_vkCreateCommandPool vkCreateCommandPool = LOAD_HARD(vkCreateCommandPool);
+//    PFN_vkAllocateCommandBuffers vkAllocateCommandBuffers = LOAD_HARD(vkAllocateCommandBuffers);
+//    PFN_vkCreateSemaphore vkCreateSemaphore = LOAD_HARD(vkCreateSemaphore);
+//    PFN_vkCreateFence vkCreateFence = LOAD_HARD(vkCreateFence);
+//    PFN_vkResetCommandBuffer vkResetCommandBuffer = LOAD_HARD(vkResetCommandBuffer);
+//    PFN_vkBeginCommandBuffer vkBeginCommandBuffer = LOAD_HARD(vkBeginCommandBuffer);
+//    PFN_vkEndCommandBuffer vkEndCommandBuffer = LOAD_HARD(vkEndCommandBuffer);
+//    PFN_vkQueueSubmit vkQueueSubmit = LOAD_HARD(vkQueueSubmit);
+//    PFN_vkResetFences vkResetFences = LOAD_HARD(vkResetFences);
+//    PFN_vkWaitForFences vkWaitForFences = LOAD_HARD(vkWaitForFences);
+//    PFN_vkCmdPipelineBarrier vkCmdPipelineBarrier = LOAD_HARD(vkCmdPipelineBarrier);
+//    PFN_vkFreeCommandBuffers vkFreeCommandBuffers = LOAD_HARD(vkFreeCommandBuffers);
+//    PFN_vkDestroyImageView vkDestroyImageView = LOAD_HARD(vkDestroyImageView);
+//    PFN_vkDestroyImage vkDestroyImage = LOAD_HARD(vkDestroyImage);
+//    PFN_vkFreeMemory vkFreeMemory = LOAD_HARD(vkFreeMemory);
+//    PFN_vkDestroyCommandPool vkDestroyCommandPool = LOAD_HARD(vkDestroyCommandPool);
+//    PFN_vkDestroySemaphore vkDestroySemaphore = LOAD_HARD(vkDestroySemaphore);
+//    PFN_vkDestroyFence vkDestroyFence = LOAD_HARD(vkDestroyFence);
+//    PFN_vkCreateRenderPass vkCreateRenderPass = LOAD_HARD(vkCreateRenderPass);
+//    PFN_vkCreateShaderModule vkCreateShaderModule = LOAD_HARD(vkCreateShaderModule);
+//    PFN_vkCreateGraphicsPipelines vkCreateGraphicsPipelines = LOAD_HARD(vkCreateGraphicsPipelines);
+//    PFN_vkCreatePipelineCache vkCreatePipelineCache = LOAD_HARD(vkCreatePipelineCache);
+//    PFN_vkDestroyPipelineCache vkDestroyPipelineCache = LOAD_HARD(vkDestroyPipelineCache);
+//    PFN_vkDestroyShaderModule vkDestroyShaderModule = LOAD_HARD(vkDestroyShaderModule);
+//    PFN_vkCreateBuffer vkCreateBuffer = LOAD_HARD(vkCreateBuffer);
+//    PFN_vkGetBufferMemoryRequirements vkGetBufferMemoryRequirements = LOAD_HARD(vkGetBufferMemoryRequirements);
+//    PFN_vkQueuePresentKHR vkQueuePresentKHR = LOAD_HARD(vkQueuePresentKHR);
+//    PFN_vkAcquireNextImageKHR vkAcquireNextImageKhr = LOAD_HARD(vkAcquireNextImageKhr);
+//    PFN_vkCmdBeginRenderPass vkCmdBeginRenderPass = LOAD_HARD(vkCmdBeginRenderPass);
+//    PFN_vkCmdBindPipeline vkCmdBindPipeline = LOAD_HARD(vkCmdBindPipeline);
+//    PFN_vkCmdEndRenderPass vkCmdEndRenderPass = LOAD_HARD(vkCmdEndRenderPass);
+//    PFN_vkCmdDraw vkCmdDraw = LOAD_HARD(vkCmdDraw);
+//    PFN_vkCmdBindVertexBuffers vkCmdBindVertexBuffers = LOAD_HARD(vkCmdBindVertexBuffers);
+//    PFN_vkMapMemory vkMapMemory = LOAD_HARD(vkMapMemory);
+//    PFN_vkUnmapMemory vkUnmapMemory = LOAD_HARD(vkUnmapMemory);
+//    PFN_vkBindBufferMemory vkBindBufferMemory = LOAD_HARD(vkBindBufferMemory);
+//    PFN_vkCreateFramebuffer vkCreateFramebuffer = LOAD_HARD(vkCreateFramebuffer);
 
 
 
-    void initializedAll(){
+    void initializedAll() {
 
-
+        logRun(" initialize oz 1 ");
         Load(vkEnumerateInstanceVersion, "vkEnumerateInstanceVersion");
+        logRun(" initialize oz 2 ");
         Load(vkEnumerateInstanceExtensionProperties, "vkEnumerateInstanceExtensionProperties");
-        Load(vkEnumerateInstanceLayerProperties, "vkEnumerateInstanceLayerProperties");
-        Load(vkCreateInstance, "vkCreateInstance");
-        Load(vkDestroyInstance, "vkDestroyInstance");
-        Load(vkDestroyDevice, "vkDestroyDevice");
-        Load(vkDestroySurfaceKHR, "vkDestroySurfaceKHR");
-        Load(vkDestroySwapchainKHR, "vkDestroySwapchainKHR");
-        Load(vkCreateDevice, "vkCreateDevice");
-        Load(vkCreateSwapchainKHR, "vkCreateSwapchainKHR");
-        Load(vkCreateImageView, "vkCreateImageView");
-        Load(vkCreateImage, "vkCreateImage");
-        Load(vkAllocateMemory, "vkAllocateMemory");
-        Load(vkBindImageMemory, "vkBindImageMemory");
-        Load(vkCreateCommandPool, "vkCreateCommandPool");
-        Load(vkAllocateCommandBuffers, "vkAllocateCommandBuffers");
-        Load(vkCreateSemaphore, "vkCreateSemaphore");
-        Load(vkCreateFence, "vkCreateFence");
-        Load(vkResetCommandBuffer, "vkResetCommandBuffer");
-        Load(vkBeginCommandBuffer, "vkBeginCommandBuffer");
-        Load(vkEndCommandBuffer, "vkEndCommandBuffer");
-        Load(vkQueueSubmit, "vkQueueSubmit");
-        Load(vkResetFences, "vkResetFences");
-        Load(vkWaitForFences, "vkWaitForFences");
-        Load(vkCmdPipelineBarrier, "vkCmdPipelineBarrier");
-        Load(vkFreeCommandBuffers, "vkFreeCommandBuffers");
-        Load(vkDestroyImageView, "vkDestroyImageView");
-        Load(vkDestroyImage, "vkDestroyImage");
-        Load(vkFreeMemory, "vkFreeMemory");
-        Load(vkDestroyCommandPool, "vkDestroyCommandPool");
-        Load(vkDestroySemaphore, "vkDestroySemaphore");
-        Load(vkDestroyFence, "vkDestroyFence");
-        Load(vkCreateRenderPass, "vkCreateRenderPass");
-        Load(vkCreateShaderModule, "vkCreateShaderModule");
-        Load(vkCreateGraphicsPipelines, "vkCreateGraphicsPipelines");
-        Load(vkCreatePipelineCache, "vkCreatePipelineCache");
-        Load(vkCreateBuffer, "vkCreateBuffer");
-        Load(vkGetBufferMemoryRequirements, "vkGetBufferMemoryRequirements");
-        Load(vkQueuePresentKHR, "vkQueuePresentKHR");
-        Load(vkAcquireNextImageKhr, "vkAcquireNextImageKhr");
-        Load(vkCmdBeginRenderPass, "vkCmdBeginRenderPass");
-        Load(vkCmdBindPipeline, "vkCmdBindPipeline");
-        Load(vkCmdEndRenderPass, "vkCmdEndRenderPass");
-        Load(vkCmdDraw, "vkCmdDraw");
-        Load(vkCmdBindVertexBuffers, "vkCmdBindVertexBuffers");
-        Load(vkMapMemory, "vkMapMemory");
-        Load(vkUnmapMemory, "vkUnmapMemory");
-        Load(vkBindBufferMemory, "vkBindBufferMemory");
-        Load(vkCreateFramebuffer, "vkCreateFramebuffer");
+        logRun(" initiailize oz 3 ");
 
+        VkResult res;
+        uint32_t versionVulkan = 0;
+        uint32_t currentVersionVulkan;
+        res = vkEnumerateInstanceVersion(&versionVulkan);
 
-        // vkGetInstanceProcAddr
-        Load(vkDestroyPipelineCache, "vkDestroyPipelineCache");
-        Load(vkDestroyShaderModule, "vkDestroyShaderModule");
-        Load(vkGetInstanceProcAddr, "vkGetInstanceProcAddr");
+        uint16_t lMajor = VK_VERSION_MAJOR(versionVulkan);
+        uint16_t lMijor = VK_VERSION_MINOR(versionVulkan);
+        logRun(" My vulkan version's == %d.%d", lMajor, lMijor);
+
+//        Load(vkEnumerateInstanceLayerProperties, "vkEnumerateInstanceLayerProperties");
+//        Load(vkCreateInstance, "vkCreateInstance");
+//        Load(vkDestroyInstance, "vkDestroyInstance");
+//        Load(vkDestroyDevice, "vkDestroyDevice");
+//        Load(vkDestroySurfaceKHR, "vkDestroySurfaceKHR");
+//        Load(vkDestroySwapchainKHR, "vkDestroySwapchainKHR");
+//        Load(vkCreateDevice, "vkCreateDevice");
+//        Load(vkCreateSwapchainKHR, "vkCreateSwapchainKHR");
+//        Load(vkCreateImageView, "vkCreateImageView");
+//        Load(vkCreateImage, "vkCreateImage");
+//        Load(vkAllocateMemory, "vkAllocateMemory");
+//        Load(vkBindImageMemory, "vkBindImageMemory");
+//        Load(vkCreateCommandPool, "vkCreateCommandPool");
+//        Load(vkAllocateCommandBuffers, "vkAllocateCommandBuffers");
+//        Load(vkCreateSemaphore, "vkCreateSemaphore");
+//        Load(vkCreateFence, "vkCreateFence");
+//        Load(vkResetCommandBuffer, "vkResetCommandBuffer");
+//        Load(vkBeginCommandBuffer, "vkBeginCommandBuffer");
+//        Load(vkEndCommandBuffer, "vkEndCommandBuffer");
+//        Load(vkQueueSubmit, "vkQueueSubmit");
+//        Load(vkResetFences, "vkResetFences");
+//        Load(vkWaitForFences, "vkWaitForFences");
+//        Load(vkCmdPipelineBarrier, "vkCmdPipelineBarrier");
+//        Load(vkFreeCommandBuffers, "vkFreeCommandBuffers");
+//        Load(vkDestroyImageView, "vkDestroyImageView");
+//        Load(vkDestroyImage, "vkDestroyImage");
+//        Load(vkFreeMemory, "vkFreeMemory");
+//        Load(vkDestroyCommandPool, "vkDestroyCommandPool");
+//        Load(vkDestroySemaphore, "vkDestroySemaphore");
+//        Load(vkDestroyFence, "vkDestroyFence");
+//        Load(vkCreateRenderPass, "vkCreateRenderPass");
+//        Load(vkCreateShaderModule, "vkCreateShaderModule");
+//        Load(vkCreateGraphicsPipelines, "vkCreateGraphicsPipelines");
+//        Load(vkCreatePipelineCache, "vkCreatePipelineCache");
+//        Load(vkCreateBuffer, "vkCreateBuffer");
+//        Load(vkGetBufferMemoryRequirements, "vkGetBufferMemoryRequirements");
+//        Load(vkQueuePresentKHR, "vkQueuePresentKHR");
+//      //  Load(vkAcquireNextImageKhr, "vkAcquireNextImageKhr");
+//        Load(vkCmdBeginRenderPass, "vkCmdBeginRenderPass");
+//        Load(vkCmdBindPipeline, "vkCmdBindPipeline");
+//        Load(vkCmdEndRenderPass, "vkCmdEndRenderPass");
+//        Load(vkCmdDraw, "vkCmdDraw");
+//        Load(vkCmdBindVertexBuffers, "vkCmdBindVertexBuffers");
+//        Load(vkMapMemory, "vkMapMemory");
+//        Load(vkUnmapMemory, "vkUnmapMemory");
+//        Load(vkBindBufferMemory, "vkBindBufferMemory");
+//        Load(vkCreateFramebuffer, "vkCreateFramebuffer");
+//
+//
+//        // vkGetInstanceProcAddr
+//        Load(vkDestroyPipelineCache, "vkDestroyPipelineCache");
+//        Load(vkDestroyShaderModule, "vkDestroyShaderModule");
+//        Load(vkGetInstanceProcAddr, "vkGetInstanceProcAddr");
 
 
         // extension not loading ??

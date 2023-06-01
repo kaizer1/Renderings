@@ -1,0 +1,22 @@
+[versions]
+gradle-main-version = "8.1.0-beta04"
+gradle-main-settings-version = "8.0.1"
+gradle-main-settings-api-version = "8.1.0-beta01"
+kotlin-version-gragle = "1.8.10"
+core-ktx = "1.10.1"
+
+[libraries]
+kotlinm = {group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin-version-gragle"}
+corek = {group = "androidx.core", name = "core-ktx", version.ref = "core-ktx"}
+
+
+#//        classpath 'com.android.tools.build:gradle:8.1.0-beta04'
+#//        classpath 'com.android.tools.build:gradle-settings:8.0.1' // was 7.3.1
+#//        classpath 'com.android.tools.build:gradle-settings-api:8.1.0-beta01'
+#//        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+[plugins]
+#caa = {id = "com.android.tools.build", name = "gradle", version.ref = "gradle-main-version"}
+com-android-application = {id = "com.android.application", version.ref = "gradle-main-version"}
+org-jetbrains-kotlin-android = {id  ="org.jetbrains.kotlin.android", version.ref = "kotlin-version-gragle"}
+
+[bundles]

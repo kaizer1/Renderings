@@ -126,6 +126,7 @@ void android_main(struct android_app* state)
     LosAssetLoaderInit((void *) state->activity->assetManager);
    // mainAp = state;
     logRun("86 " );
+    mainAp = state;
     auto run = std::make_unique<LosMainVulkan>();
     logRun("Pre loop " );
     run->looperMainVulkan();

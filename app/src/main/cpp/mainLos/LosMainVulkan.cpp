@@ -888,6 +888,7 @@ void LosMainVulkan::initializeMyVulkan() {
 
       // std::experimental::pmr::
 
+
       
 
 
@@ -940,13 +941,6 @@ void LosMainVulkan::initializeMyVulkan() {
      //  std::thread aThreadLos { SendOther(5) };
      // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
      //   aThreadLos.join();
-
-
-
-
-
-
-
 
 
 
@@ -1027,9 +1021,9 @@ void LosMainVulkan::initializeMyVulkan() {
     uint32_t currentVersionVulkan;
     res = vkEnumerateInstanceVersion(&versionVulkan);
 
-    uint16_t lMajor = VK_VERSION_MAJOR(versionVulkan);
-    uint16_t lMijor = VK_VERSION_MINOR(versionVulkan);
-    logRun(" My vulkan in app's loading version's == %d.%d", lMajor, lMijor);
+    uint16_t lMajor1 = VK_VERSION_MAJOR(versionVulkan);
+    uint16_t lMijor1 = VK_VERSION_MINOR(versionVulkan);
+    logRun(" My vulkan in app's loading version's == %d.%d", lMajor1, lMijor1);
 
 
     if (res != VK_SUCCESS) {
@@ -1051,7 +1045,7 @@ void LosMainVulkan::initializeMyVulkan() {
 
     uint32_t instancExtensCount = 0;
     res = vkEnumerateInstanceExtensionProperties(nullptr, &instancExtensCount, nullptr);
-    VkExtensionProperties *instaProperty = new VkExtensionProperties[instancExtensCount];
+    auto *instaProperty = new VkExtensionProperties[instancExtensCount];
     res = vkEnumerateInstanceExtensionProperties(nullptr, &instancExtensCount,instaProperty);
 
 
@@ -1123,7 +1117,7 @@ void LosMainVulkan::initializeMyVulkan() {
 
 
     logRun(" my extension number == %d \n", countExtens);
-    logRun(" extensi vector data == %d \n", extensionForAdd.size());
+    logRun(" extensi vector data == %lu \n", extensionForAdd.size());
 
 
     VkApplicationInfo appInfo{};
@@ -1144,14 +1138,16 @@ void LosMainVulkan::initializeMyVulkan() {
        std::vector<const char *> layName;
        layName.push_back("VK_LAYER_KHRONOS_validation");
 
+
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
-        createInfo.enabledLayerCount = static_cast<uint32_t>(layName.size());
-        createInfo.ppEnabledLayerNames = layName.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(layName.size()); // was layName.size()
+        createInfo.ppEnabledLayerNames = layName.data(); // layName.data();
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
 
 
-  VkInstance instance;
+
+    VkInstance instance;
     VK_CHECK2(vkCreateInstance(&createInfo, nullptr, &instance));
 
    // vulkanA = myVulkan();
@@ -1343,43 +1339,75 @@ void LosMainVulkan::initializeMyVulkan() {
 //    FpvkCreateDebugReportCallbackEXT(vulkanA.mainInstance, &callback1, nullptr, &cb1);
 //
 //
-//    PFN_vkVoidFunction temp_fp2Enum = check->vkGetInstanceProcAddr(vulkanA.mainInstance,
-//                                                                   "vkEnumeratePhysicalDevices");
-//    if (!temp_fp2Enum) throw "Failed to load vkCreateDebugReportCallbackEXT";
-//
-//    uint32_t ip; // = memAllocInt(1);
-//    PFN_vkEnumeratePhysicalDevices vkEnumeratePhysicalDevices1 = reinterpret_cast<PFN_vkEnumeratePhysicalDevices>( temp_fp2Enum );
-//
-//    res = vkEnumeratePhysicalDevices1(vulkanA.mainInstance, &ip, nullptr);
-//    logRun(" my pysical devices numbres == %d \n", ip);
-//    VkPhysicalDevice *mpPhysicalDevices = nullptr;
-//    mpPhysicalDevices = new VkPhysicalDevice[ip];
-//    res = vkEnumeratePhysicalDevices1(vulkanA.mainInstance, &ip, mpPhysicalDevices);
-//
-//    auto myPhysicalDevice = mpPhysicalDevices[0];
-//
-//    PFN_vkVoidFunction temp_fp2DevProperties = check->vkGetInstanceProcAddr(vulkanA.mainInstance,
-//                                                                            "vkGetPhysicalDeviceProperties");
-//    if (!temp_fp2DevProperties) throw "Failed to load vkGetPhysicalDeviceProperties";
-//
-//    PFN_vkGetPhysicalDeviceProperties vkGetPhysicalDeviceProperties1 = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties>( temp_fp2DevProperties );
-//    // get Data to enumerate physics devices
-//    VkPhysicalDeviceProperties mPhysicalDevicesProperties;
-//    vkGetPhysicalDeviceProperties1(myPhysicalDevice, &mPhysicalDevicesProperties);
-//    logRun(" my physical device prorerties ID == %u \n", mPhysicalDevicesProperties.deviceID);
-//    logRun(" my physical device prorerties name == %s \n", mPhysicalDevicesProperties.deviceName);
-//
-//
-//    PFN_vkVoidFunction temp_fp2DevDmProper = check->vkGetInstanceProcAddr(vulkanA.mainInstance,
-//                                                                          "vkGetPhysicalDeviceMemoryProperties");
-//    if (!temp_fp2DevDmProper) throw "Failed to load vkGetPhysicalDeviceMemoryProperties";
-//
-//    PFN_vkGetPhysicalDeviceMemoryProperties vkGetPhysicalDeviceMemoryProperties1 = reinterpret_cast<PFN_vkGetPhysicalDeviceMemoryProperties>( temp_fp2DevDmProper );
-//
-//
-//    vkGetPhysicalDeviceMemoryProperties1(myPhysicalDevice, &myPhysicalDeviceMemoryPropertises2);
-//
-//
+    PFN_vkVoidFunction temp_fp2Enum = vkGetInstanceProcAddr(instance, "vkEnumeratePhysicalDevices");
+    if (!temp_fp2Enum) throw "Failed to load vkEnumeratePhysicalDevices";
+
+     uint32_t ip; // = memAllocInt(1);
+     PFN_vkEnumeratePhysicalDevices vkEnumeratePhysicalDevices1 = reinterpret_cast<PFN_vkEnumeratePhysicalDevices>( temp_fp2Enum );
+
+      res = vkEnumeratePhysicalDevices1(instance, &ip, nullptr);
+      logRun(" my pysical devices numbres == %d \n", ip);
+      VkPhysicalDevice *myPhysicalDevices = nullptr;
+      myPhysicalDevices = new VkPhysicalDevice[ip];
+      res = vkEnumeratePhysicalDevices1(instance, &ip, myPhysicalDevices);
+
+      auto mPhysMainDev = myPhysicalDevices[0];
+
+      PFN_vkVoidFunction temp_fp2DevProperties = vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties");
+      if (!temp_fp2DevProperties) throw "Failed to load vkGetPhysicalDeviceProperties";
+
+      auto vkGetPhysicalDeviceProperties1 = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties>( temp_fp2DevProperties );
+    // get Data to enumerate physics devices
+      VkPhysicalDeviceProperties mPhysicalDevicesProperties;
+      vkGetPhysicalDeviceProperties1(mPhysMainDev, &mPhysicalDevicesProperties);
+      logRun(" my physical device prorerties ID == %u \n", mPhysicalDevicesProperties.deviceID);
+      logRun(" my physical device prorerties name == %s \n", mPhysicalDevicesProperties.deviceName);
+
+
+    PFN_vkVoidFunction temp_fp2DevDmProper = vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceMemoryProperties");
+    if (!temp_fp2DevDmProper) throw "Failed to load vkGetPhysicalDeviceMemoryProperties";
+
+     PFN_vkGetPhysicalDeviceMemoryProperties vkGetPhysicalDeviceMemoryProperties1 = reinterpret_cast<PFN_vkGetPhysicalDeviceMemoryProperties>( temp_fp2DevDmProper );
+
+
+     vkGetPhysicalDeviceMemoryProperties1(mPhysMainDev, &myPhysicalDeviceMemoryPropertises2);
+
+     logRun("type memory count = %d \n", myPhysicalDeviceMemoryPropertises2.memoryTypeCount);
+     logRun("type heap memory count = %d \n", myPhysicalDeviceMemoryPropertises2.memoryHeapCount);
+
+
+     for(auto i =0; i < myPhysicalDeviceMemoryPropertises2.memoryTypeCount; i++){
+
+         VkMemoryType auow = myPhysicalDeviceMemoryPropertises2.memoryTypes[i];
+         logRun("  heapIndex == %d ", auow.heapIndex);
+         logRun("  propertyFlags == %d ", auow.propertyFlags);
+     }
+
+
+     //typedef struct VkMemoryType {
+    //    VkMemoryPropertyFlags    propertyFlags;
+    //    uint32_t                 heapIndex;
+    //} VkMemoryType;
+
+     // VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT = 0x00000001,
+    //    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT = 0x00000002,
+    //    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT = 0x00000004,
+    //    VK_MEMORY_PROPERTY_HOST_CACHED_BIT = 0x00000008,
+    //    VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT = 0x00000010,
+    //    VK_MEMORY_PROPERTY_PROTECTED_BIT = 0x00000020,
+    //    VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD = 0x00000040,
+    //    VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD = 0x00000080,
+    //    VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV = 0x00000100,
+    //    VK_MEMORY_PROPERTY_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+
+     //    uint32_t        memoryTypeCount;
+    //    VkMemoryType    memoryTypes[VK_MAX_MEMORY_TYPES];
+    //    uint32_t        memoryHeapCount;
+    //    VkMemoryHeap    memoryHeaps[VK_MAX_MEMORY_HEAPS];
+
+
+
+
 //    // vkEnumerateDeviceExtensionProperties ???
 //    PFN_vkVoidFunction temp_fp2DevExtProeper = check->vkGetInstanceProcAddr(vulkanA.mainInstance, "vkEnumerateDeviceExtensionProperties");
 //    if (!temp_fp2DevExtProeper) throw "Failed to load vkGetPhysicalDeviceMemoryProperties";
@@ -2440,7 +2468,7 @@ void LosMainVulkan::SetImageLayoutLos(VkImage image, VkCommandBuffer cmdBuffer, 
 
 
 
- const void  LosMainVulkan::looperMainVulkan(){
+ void  LosMainVulkan::looperMainVulkan(){
 
     int32_t ident;
     int32_t events;

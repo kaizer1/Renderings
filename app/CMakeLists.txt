@@ -1,10 +1,28 @@
-# For more information about using CMake with Android Studio, read the
-# documentation: https://d.android.com/studio/projects/add-native-code.html
 
-# was 3.18.1
-cmake_minimum_required(VERSION 3.18.1)
+cmake_minimum_required(VERSION 3.27.0)
 
-project("renderings")
+project("renderings" LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+
+
+if(CMAKE_VERSION VERSION_LESS "3.27.0")
+  set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "2182bf5c-ef0d-489a-91da-49dbc3090d2a")
+else()
+  set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "aa1f7df0-828a-4fcd-9afc-2dc80491aca7")
+endif()
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP 1)
+
+#set(LIBCXX_BUILD "Q:/LosProgram/clangModule/llvm-project/build")
+#add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=${CMAKE_BINARY_DIR}/_deps/std-build/CMakeFiles/std.dir/>)
+#add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>)
+## The include path needs to be set to be able to use macros from headers.
+## For example from, the headers <cassert> and <version>.
+#add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-isystem>)
+#add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${LIBCXX_BUILD}/include/c++/v1>)
+
+set(CMAKE_ANDROID_ARCH_ABI arm64-v8a)
 
 # see library Q:\AndroidSDK\ndk\24.0.7956693\toolchains\llvm\prebuilt\windows-x86_64\sysroot\usr\lib\aarch64-linux-android\28
 MESSAGE(WARNING "sdf: " ${ANDROID_PLATFORM})
@@ -12,8 +30,8 @@ set(gluLos ../../GlueLos)
 
 set(cpuFeatures ../../../AndroidSDK/ndk/25.0.8775105/sources/android/cpufeatures)
 
-if(${ANDROID_PLATFORM} MATCHES "android-29" )
-  MESSAGE(WARNING " minAPI 29 ok ")  #  was 24
+if(${ANDROID_PLATFORM} MATCHES "android-28" )
+  MESSAGE(WARNING " minAPI 28 ok ")  #  was 24
   set(exists33 false)
 else()
   MESSAGE(WARNING " minAPi 33 ok  ")
@@ -21,7 +39,8 @@ else()
 endif()
 
 
-
+#add_definitions(-DLIBCXX_ENABLE_STD_MODULES=ON)
+#add_definitions(-DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind")
 add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR=1)
 
 #add_library(glueLos STATIC ${gluLos}/los_android_native_app_glue.c)
@@ -34,9 +53,7 @@ set_property(TARGET glueLos PROPERTY IMPORTED_LOCATION "../../../../src/jniLibs/
 add_library(featureCPU STATIC IMPORTED)
 set_property(TARGET featureCPU PROPERTY IMPORTED_LOCATION "../../../../src/jniLibs/arm64-v8a/libfeatureCPU.a")
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_HAS_PARALLEL_ALGORITHMS")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
-
 
 add_library( renderingsLos  SHARED
 
@@ -50,10 +67,21 @@ add_library( renderingsLos  SHARED
         src/main/cpp/AudioEngines/AudioMain.cpp
         )
 
+#add_library(validKhronosLayers SHARED IMPORTED)
+#set_property(TARGET renderingsLos PROPERTY IMPORTED_LOCATION "../../../../src/jniLibs/arm64-v8a/libVkLayer_khronos_validation.so")
+
 
 find_library(  log-lib
 
               log )
+
+
+target_sources(renderingsLos
+        PUBLIC
+        FILE_SET all_my_modules TYPE CXX_MODULES FILES
+        src/main/cpp/foo.ixx
+        )
+
 
 target_include_directories(renderingsLos PRIVATE
         ${gluLos}
@@ -83,8 +111,8 @@ target_link_libraries(renderingsLos
                        featureCPU
                       -fopenmp
                       -static-openmp
-                       aaudio # olny api 26 added
-                      -pthread # ok added this
+                       aaudio
+                      -pthread
                       ${log-lib} )
 
 # add sanitize for android

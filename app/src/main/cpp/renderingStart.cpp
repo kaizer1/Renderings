@@ -1,14 +1,14 @@
 // TODO Loskutnikov Games .inc
 
-#include "mainLos/LosMainVulkan.h"
-#include "mainLos/assetsLos.h"
-
+#include "LosMainVulkan.h"
+#include "assetsLos.h"
 //import androidndk;
 
 //import "xlocale.h";
 
 //#include <string>
 
+import ModuleA;
 
 //import std_config;
 //import string;
@@ -27,23 +27,6 @@
 #include <atomic>
 #include <thread>
 #include <vector>
-//import string;
-//import locale_h;
-//import __locale;
-
-//import math;
-//#include <los_android_native_app_glue.h>
-//import android_ndk_main;
-//import ModuleA;
-//import Foo;
-//import std;
-//import androidndk;
-//#include <los_android_native_app_glue.h>
-//import <los_android_native_app_glue.h>;
-
-
-
-
 
 
 enum class Color {
@@ -101,6 +84,7 @@ void android_main(struct android_app* state)
       //std::string adfsdf("sdfasdf");
 
     logRun(" my values ! %d", 3000);
+    logRun(" my values ! %d", ModuleA_NS::f() );
 
     // new render is
 
@@ -123,7 +107,7 @@ void android_main(struct android_app* state)
 
 
 
-    LosAssetLoaderInit((void *) state->activity->assetManager);
+    //LosAssetLoaderInit((void *) state->activity->assetManager);
    // mainAp = state;
     logRun("86 " );
     mainAp = state;

@@ -1,63 +1,47 @@
-@Suppress("DSL_SCOPE_VIOLATION")
+
 plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
-    compileSdk = 33
+    compileSdk = rootProject.extra["versionCurrent"] as Int
 
     // ok work
-//    signingConfigs {
-//        register("release") {
-//            keyAlias = "upload"
-//            keyPassword = System.getenv("KEYSTORE_PASSPHRASE")
-//            storeFile = file("../owntracks.release.keystore.jks")
-//            storePassword = System.getenv("KEYSTORE_PASSPHRASE")
-//            enableV1Signing = true
-//            enableV2Signing = true
-//            enableV3Signing = true
-//            enableV4Signing = true
-//        }
-//    }
+    signingConfigs {
+        register("release") {
+            keyAlias = "upload"
+            keyPassword = System.getenv("KEYSTORE_PASSPHRASE")
+            storeFile = file("../owntracks.release.keystore.jks")
+            storePassword = System.getenv("KEYSTORE_PASSPHRASE")
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+            enableV4Signing = true
+        }
+    }
 
     packaging {
         jniLibs {
             useLegacyPackaging = false
         }
+
+        lint {
+            abortOnError = false
+        }
     }
 
 
 
-//    execution {
-//        profiles {
-//            high {
-//                r8 {
-//                    jvmOptions += ["-Xms2048m", "-Xmx8192m", "-XX:+HeapDumpOnOutOfMemoryError"]
-//                    runInSeparateProcess true
-//                }
-//            }
-//            low {
-//                r8 {
-//                    jvmOptions += ["-Xms256m", "-Xmx2048m", "-XX:+HeapDumpOnOutOfMemoryError"]
-//                    runInSeparateProcess true
-//                }
-//            }
-//            ci {
-//                r8.runInSeparateProcess false
-//            }
-//        }
-//        defaultProfile "high"
-//    }
 
     defaultConfig {
-        applicationId = "com.sergey.los.freelanceideas.renderings"
-        minSdk =  28
-        targetSdk = 33
+        minSdk =  rootProject.extra["minVersion1"] as Int // val versionCurrent by extra(34)
+        targetSdk =  rootProject.extra["versionCurrent"] as Int
         versionCode = 1
         versionName = "1.0"
 
 
+        @Suppress("UnstableApiUsage")
         externalNativeBuild {
             cmake {
                 // -fbuiltin-module-map
@@ -78,6 +62,7 @@ android {
                 arguments(
                     //"-DCMAKE_ANDROID_API=" + minSdk.toString(),
                     //"-DICU_ASSET_EXPORT_DIR=" + project.file("src/main/assets/icu4c").absolutePath,
+                    //"-DCMAKE_C_COMPILER='C:/Program Files/LLVM/bin/Clang.exe' -DCMAKE_CXX_COMPILER='C:/Program Files/LLVM/bin/Clang++.exe' ",
                     "-DBUILD_SHARED_LIBS=false",
                     "-DANDROID_STL=c++_static",
                 )
@@ -86,42 +71,22 @@ android {
 
         //noinspection ChromeOsAbiSupport
         ndk { abiFilters += listOf("arm64-v8a") }
-        ndkVersion = "25.0.8775105"
     }
 
 
-    //flavorDimensions.add("api")
 
      flavorDimensions += "api"
-
     productFlavors {
         create("minApi33") {
-            minSdk = 33
+            minSdk = rootProject.extra["minVersion2"] as Int
             versionNameSuffix = "-minApi33"
         }
 
         create("minApi28"){
-            minSdk = 28
+            minSdk = rootProject.extra["minVersion1"] as Int
             versionNameSuffix = "-minApi28"
         }
     }
-
-//    productFlavors {
-//        minApi33 {
-//            minSdkVersion = "33"
-//            versionNameSuffix = "-minApi33"
-//        }
-//
-//        minApi29 {
-//            minSdkVersion = "28"
-//            versionNameSuffix = "-minApi28"
-//        }
-//    }
-
-    buildFeatures {
-        viewBinding =  true
-    }
-
 
     buildTypes {
       named("debug") {
@@ -139,11 +104,11 @@ android {
         }
     }
 
+
     externalNativeBuild {
         cmake {
             path ( "CMakeLists.txt" )
-            version  = "3.22.0" // was 3.18.1
-            //arguments "-DHWASAN=1"
+            version  = "3.27.1" // was 3.18.1  //arguments "-DHWASAN=1"
         }
     }
 
@@ -158,45 +123,19 @@ android {
 
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        //jvmTarget = '1.8'
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
-    ndkVersion = "25.0.8775105"
-    namespace = "com.sergey.los.freelanceideas.renderings"
 
-
-//     execution {
-//          profiles {
-//               high {
-//                   r8 {
-//                        jvmOptions += ["-Xms2048m", "-Xmx8192m", "-XX:+HeapDumpOnOutOfMemoryError"]
-//                        runInSeparateProcess true
-//                   }
-//               }
-//              low {
-//                  r8 {
-//                      jvmOptions += ["-Xms256m", "-Xmx2048m", "-XX:+HeapDumpOnOutOfMemoryError"]
-//                      runInSeparateProcess true
-//                  }
-//              }
-//              ci {
-//                  r8.runInSeparateProcess false
-//              }
-//          }
-//         defaultProfile "high"
-//     }
+    ndkVersion = rootProject.extra["ndkVersion"] as String
+    namespace = rootProject.extra["nameId"] as String
 
 }
 
 dependencies {
-    //implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    //implementation 'androidx.core:core-ktx:1.10.1'
-
     implementation(libs.kotlinm)
     implementation(libs.corek)
-
 }

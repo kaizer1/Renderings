@@ -1,11 +1,7 @@
 package com.sergey.los.freelanceideas.renderings
 
-
-import android.annotation.TargetApi
 import android.app.NativeActivity
-import android.os.Build
 import android.os.Bundle
-import android.view.Display
 import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat

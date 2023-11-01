@@ -419,7 +419,7 @@ public:
       static void LosApplicationCMD(struct android_app* app, int32_t cmd);
       static int32_t losInputWorkingHandle (struct android_app* app, AInputEvent* event);
 
-      const void looperMainVulkan();
+      void looperMainVulkan();
 
     VkDebugReportCallbackEXT cb1;
 
@@ -461,7 +461,7 @@ protected:
 private:
 
     void inputWrapper(int32_t cmd);
-    void initializeMyVulkan();
+    static void initializeMyVulkan();
 
     uint32_t LosWidth;
     uint32_t LosHeight;

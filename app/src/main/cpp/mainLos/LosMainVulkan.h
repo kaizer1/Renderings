@@ -421,7 +421,7 @@ public:
 
       void looperMainVulkan();
 
-    VkDebugReportCallbackEXT cb1;
+      VkDebugReportCallbackEXT cb1;
 
     void PresentBBuffers();
     void SetNextBuf();

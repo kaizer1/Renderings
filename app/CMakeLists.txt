@@ -14,6 +14,10 @@ else()
 endif()
 set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP 1)
 
+
+
+
+
 #set(LIBCXX_BUILD "Q:/LosProgram/clangModule/llvm-project/build")
 #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=${CMAKE_BINARY_DIR}/_deps/std-build/CMakeFiles/std.dir/>)
 #add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>)
@@ -93,6 +97,26 @@ target_include_directories(renderingsLos PRIVATE
         )
 
 
+target_compile_options(renderingsLos PUBLIC -fsanitize=address -fno-omit-frame-pointer)
+set_target_properties(renderingsLos PROPERTIES LINK_FLAGS -fsanitize=address)
+
+get_filename_component(HINT_PATH ${ANDROID_C_COMPILER} DIRECTORY)
+#set(ARCH_STR ${CMAKE_ANDROID_ARCH})
+set(ARCH_STR "aarch64")
+
+find_file(ASAN
+        NAMES libclang_rt.asan-${ARCH_STR}-android.so
+        HINTS ${HINT_PATH}/../lib64/clang/14.0.1/lib/linux)
+
+
+get_filename_component(ASAN_NAME ${ASAN} NAME)
+set(ASAN_NAME ${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI}/${ASAN_NAME})
+
+
+
+
+
+
 if(${exists33})
   #set(BinaryLibraryAdd EGL GLESv3)
    set(BinaryLibraryAdd vulkan)
@@ -100,7 +124,9 @@ else()
   set(BinaryLibraryAdd vulkan)
 endif()
 
-
+add_custom_command(
+        TARGET renderingsLos PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${ASAN} ${ASAN_NAME})
 
 set_target_properties(renderingsLos PROPERTIES COMPILE_OPTIONS -fopenmp)
 

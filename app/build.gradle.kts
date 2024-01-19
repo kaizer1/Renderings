@@ -130,6 +130,24 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+//     androidResources {
+//        noCompress "baz"
+//    }
+
+//       packagingOptions {
+//        jniLibs {
+//            // Libraries that are wrongly included in the junit-gtest AAR that
+//            // will end up in our APK if we don't explicitly exclude them.
+//            excludes += [
+//                "**/libadder.so",
+//                "**/libapptest.so",
+//                "**/libc++_shared.so",
+//            ]
+//        }
+//    }
+
+
+
     ndkVersion = rootProject.extra["ndkVersion"] as String
     namespace = rootProject.extra["nameId"] as String
 

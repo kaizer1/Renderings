@@ -13,13 +13,14 @@
 #include "logLos.h"
 
 
+#include <coroutine>
 #include <vector>
 #include <string>
 
 #include <thread>
 #include <concepts>
-#include <experimental/coroutine>
-#include <experimental/algorithm>
+//#include <experimental/coroutine>
+//#include <experimental/algorithm>
 #include <execution>
 
 #include <experimental/memory_resource>
@@ -30,9 +31,14 @@
 //#include "module.modulemap"
 
 #include <bit>
+#include <vulkan/vulkan_core.h>
 
 
 #include <logLos.h>
+#include <android/trace.h>
+#include <android/thermal.h>
+
+
 
 #define VK_CHECK2(x)                           \
   do {                                        \
@@ -491,9 +497,17 @@ LosMainVulkan::LosMainVulkan() {
     logRun(" start losMain 01 ");
     mainAp->userData = mainAp->userData;
     logRun(" start losMain 02 ");
+
+    if(ATrace_isEnabled()){
+          logRun(" atrace in enabled !  ");
+    }
+
+
     mainAp->onAppCmd = LosApplicationCMD;
     logRun(" start losMain 03 ");
     mainAp->onInputEvent = losInputWorkingHandle;
+
+
 
 
 
@@ -668,7 +682,7 @@ int32_t LosMainVulkan::losInputWorkingHandle (struct android_app* app, AInputEve
 }
 
 
-#include <cpu-features.h>
+//#include <cpu-features.h>
 
 #include <chrono>
 #include <iostream>
@@ -676,9 +690,11 @@ int32_t LosMainVulkan::losInputWorkingHandle (struct android_app* app, AInputEve
 
 #include <execution>
 #include <algorithm>
+#include <format>
 
-#include <experimental/coroutine>
-#include <experimental/functional>
+
+//#include <experimental/coroutine>
+//#include <experimental/functional>
 #include <omp.h>
 
 
@@ -687,7 +703,7 @@ static const long long numThreads = 1'000;
 
 struct Job {
     struct promise_type;
-    using handle_type = std::experimental::coroutine_handle<promise_type>;
+    using handle_type = std::coroutine_handle<promise_type>;
     handle_type coro;
     Job(handle_type h): coro(h){}
     ~Job() {
@@ -702,11 +718,11 @@ struct Job {
         auto get_return_object() {
             return Job{handle_type::from_promise(*this)};
         }
-        std::experimental::suspend_always initial_suspend() {
+        std::suspend_always initial_suspend() {
             logRun ("    Preparing job \n" );
             return {};
         }
-        std::experimental::suspend_always final_suspend() noexcept {
+        std::suspend_always final_suspend() noexcept {
             logRun( "    Performing job \n" );
             return {};
         }
@@ -718,7 +734,7 @@ struct Job {
 
 
 Job prepareJob() {
-    co_await std::experimental::suspend_never();
+    co_await std::suspend_never();
 }
 
 
@@ -763,7 +779,7 @@ requires Integral<T>
 
 constexpr double powera (double b, int x){
 
-    if ( std::is_constant_evaluated() && !(b == 0.0)){
+    if (std::is_constant_evaluated() && b != 0.0){
         //logRun( "is constant_ evaluated \n");
          double r = 1;
 
@@ -844,8 +860,16 @@ constexpr int f(int x){
 void LosMainVulkan::initializeMyVulkan() {
 
      // detect cpu core count
-    const int coreSize = android_getCpuCount();
-     logRun(" my core size == %d \n", coreSize);
+//    const int coreSize = android_getCpuCount();
+//     logRun(" my core size == %d \n", coreSize);
+
+
+         ATrace_beginSection("losMainS");
+
+    if(ATrace_isEnabled()){
+          logRun(" atrace in enabled ! 2   ");
+    }
+
 
        //  std::atomic_flag
        // std::atomic_flag  losFlag; // all ok
@@ -1158,7 +1182,7 @@ void LosMainVulkan::initializeMyVulkan() {
      logRun(" my thread concurrency == %d \n", aThread);
 
 
-
+ ATrace_endSection();
 
     // ANativeWindow* lef =  state->window;
 
@@ -1378,32 +1402,87 @@ void LosMainVulkan::initializeMyVulkan() {
 
      for(auto i =0; i < myPhysicalDeviceMemoryPropertises2.memoryTypeCount; i++){
 
+
+         // 7 915 040 768  type 0  8g получается ? realme old
+         //   268 435 456  type 1
+
+
+         // 6 006 636 544  type 0 6g - realme with 6g memory
+
          VkMemoryType auow = myPhysicalDeviceMemoryPropertises2.memoryTypes[i];
          logRun("  heapIndex == %d ", auow.heapIndex);
          logRun("  propertyFlags == %d ", auow.propertyFlags);
+
+//         /VkMemoryType::propertyFlags
+
+           if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT){
+               logRun(" this memory = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT");
+           }
+
+             if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT){
+               logRun(" this memory = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT");
+           }
+
+
+               if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_HOST_COHERENT_BIT){
+               logRun(" this memory = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT");
+           }
+
+                 if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_HOST_CACHED_BIT){
+               logRun(" this memory = VK_MEMORY_PROPERTY_HOST_CACHED_BIT");
+           }
+
+
+                   if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT){
+               logRun(" this memory = VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT");
+           }
+
+                     if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_PROTECTED_BIT){
+               logRun(" this memory = VK_MEMORY_PROPERTY_PROTECTED_BIT");
+           }
+
+
+                       if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD){
+               logRun(" this memory = VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD");
+           }
+
+                         if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD){
+               logRun(" this memory = VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD");
+           }
+
+                           if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV){
+               logRun(" this memory = VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV");
+           }
+
+
+      if (auow.propertyFlags == VkMemoryPropertyFlagBits:: VK_MEMORY_PROPERTY_FLAG_BITS_MAX_ENUM){
+               logRun(" this memory = VK_MEMORY_PROPERTY_FLAG_BITS_MAX_ENUM");
+           }
      }
 
 
-     //typedef struct VkMemoryType {
-    //    VkMemoryPropertyFlags    propertyFlags;
-    //    uint32_t                 heapIndex;
-    //} VkMemoryType;
 
-     // VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT = 0x00000001,
-    //    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT = 0x00000002,
-    //    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT = 0x00000004,
-    //    VK_MEMORY_PROPERTY_HOST_CACHED_BIT = 0x00000008,
-    //    VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT = 0x00000010,
-    //    VK_MEMORY_PROPERTY_PROTECTED_BIT = 0x00000020,
-    //    VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD = 0x00000040,
-    //    VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD = 0x00000080,
-    //    VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV = 0x00000100,
-    //    VK_MEMORY_PROPERTY_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+      for(auto i =0; i < myPhysicalDeviceMemoryPropertises2.memoryHeapCount; i++){
 
-     //    uint32_t        memoryTypeCount;
-    //    VkMemoryType    memoryTypes[VK_MAX_MEMORY_TYPES];
-    //    uint32_t        memoryHeapCount;
-    //    VkMemoryHeap    memoryHeaps[VK_MAX_MEMORY_HEAPS];
+        auto asd = myPhysicalDeviceMemoryPropertises2.memoryHeaps[i];
+          logRun(" heap = %lu  ", asd.size);
+
+          if(asd.flags == VkMemoryHeapFlagBits::VK_MEMORY_HEAP_DEVICE_LOCAL_BIT){
+                 logRun(" ok this VK_MEMORY_HEAP_DEVICE_LOCAL_BIT");
+          }
+
+
+          if(asd.flags == VkMemoryHeapFlagBits::VK_MEMORY_HEAP_MULTI_INSTANCE_BIT){
+                 logRun(" ok this VK_MEMORY_HEAP_MULTI_INSTANCE_BIT");
+          }
+
+
+            if(asd.flags == VkMemoryHeapFlagBits::VK_MEMORY_HEAP_FLAG_BITS_MAX_ENUM){
+                 logRun(" ok this VK_MEMORY_HEAP_FLAG_BITS_MAX_ENUM");
+          }
+     }
+
+
 
 
 

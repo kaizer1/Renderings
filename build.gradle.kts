@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.android) apply false
 }
 
+// https://www.lambdatest.com/mobile-app-testing real device tests
 
 tasks.create<Delete>("clean") {
     delete {

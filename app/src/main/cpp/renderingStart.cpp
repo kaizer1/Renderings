@@ -58,26 +58,6 @@ std::string_view toString(Color cdf){
 
 
 
-//std::vector<int> myvec{};
-//std::atomic<bool> atomicBool{false};
-//
-//void prepareWork() {
-//    myvec.insert(myvec.end(), {0, 1, 0, 3});
-//    logRun(" data prepare ! ");
-//    atomicBool.store(true);
-//    atomicBool.notify_one();
-//}
-//
-//void completeWork() {
-//
-//    logRun(" Waiting for data   ! ");
-//    atomicBool.wait(false);
-//    myvec[2] = 2;
-//    logRun(" Waiting complete  ");
-//    for (auto i : myvec) logRun(" %d ", myvec[i]);
-//}
-
-
 void android_main(struct android_app* state)
 {
 
@@ -91,6 +71,8 @@ void android_main(struct android_app* state)
      using enum Color;
 
     //logRun(" my values ! %s", toString(Color::green)); // ok test
+
+
 
 
     logRun(" building  1 ");

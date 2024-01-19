@@ -1,15 +1,13 @@
 # For more information about using CMake with Android Studio, read the
 # documentation: https://d.android.com/studio/projects/add-native-code.html
 
-# was 3.18.1
-cmake_minimum_required(VERSION 3.18.1)
-
+cmake_minimum_required(VERSION 3.22.1)
 
 project("renderings")
 
 
 MESSAGE(WARNING "sdf: " ${ANDROID_PLATFORM})
-set(gluLos ../../GlueLos)
+set(gluLos lGlue)
 
 if(${ANDROID_PLATFORM} MATCHES "android-24" )
   MESSAGE(WARNING " minAPI 24 ok ")

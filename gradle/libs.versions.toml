@@ -1,0 +1,14 @@
+[versions]
+gradle-main-version = "8.2.1"
+kotlin-version-gragle = "1.9.10"
+core-ktx = "1.12.0"
+
+[libraries]
+kotlinm = {group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin-version-gragle"}
+corek = {group = "androidx.core", name = "core-ktx", version.ref = "core-ktx"}
+
+[plugins]
+com-android-application = {id = "com.android.application", version.ref = "gradle-main-version"}
+org-jetbrains-kotlin-android = {id  ="org.jetbrains.kotlin.android", version.ref = "kotlin-version-gragle"}
+
+[bundles]

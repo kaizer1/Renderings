@@ -1,0 +1,23 @@
+
+android {
+    execution {
+        profiles {
+            high {
+                r8 {
+                    jvmOptions += ["-Xms2048m", "-Xmx8192m", "-XX:+HeapDumpOnOutOfMemoryError"]
+                    runInSeparateProcess true
+                }
+            }
+            low {
+                r8 {
+                    jvmOptions += ["-Xms256m", "-Xmx2048m", "-XX:+HeapDumpOnOutOfMemoryError"]
+                    runInSeparateProcess true
+                }
+            }
+            ci {
+                r8.runInSeparateProcess false
+            }
+        }
+        defaultProfile "low"
+    }
+}

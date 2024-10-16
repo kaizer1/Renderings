@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 35
     //buildToolsVersion "31.0.0 rc1"
 
     defaultConfig {
         applicationId "com.sergey.los.freelanceideas.renderings"
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 35
 
 
         versionCode 1
@@ -19,12 +19,12 @@ android {
       //  testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++20 " // -Ofast  -fsanitize=memory
+                cppFlags "-std=c++23" // -Ofast  -fsanitize=memory
             }
         }
 
         ndk { abiFilters 'arm64-v8a' }
-        ndkVersion '25.2.9519653'  // was 23.1.7779620
+        ndkVersion '28.0.12433566'  // was 23.1.7779620
     }
 
 
@@ -64,7 +64,7 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            version "3.22.1" // was 3.18.1
+            version "3.30.5" // was 3.18.1
         }
     }
 
@@ -78,19 +78,19 @@ android {
 
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '21'
     }
-    ndkVersion '25.2.9519653'
+    ndkVersion '28.0.12433566'
     namespace 'com.sergey.los.freelanceideas.renderings'
 }
 
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
 
 }
